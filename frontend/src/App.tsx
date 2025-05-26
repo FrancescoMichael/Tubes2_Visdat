@@ -5,6 +5,7 @@ import LineChartCard from './components/LineChartCard'
 import TableCard from './components/TableCard'
 import StatCard from './components/StatCard'
 import "./assets/fonts/Formula1-Regular_web_0.ttf";
+import bannerRed from "./assets/banner-red.png";
 
 const chartData1: ChartData<'doughnut'> = {
   labels: ['Red Bull Racing', 'McLaren', 'Ferrari', 'Mercedes'],
@@ -100,11 +101,17 @@ const data = [
 function App() {
   return (
     <div className="bg-white p-6">
-      <div style={{ color: "#1139b9", fontFamily: "RubikScribble" }} className="text-6xl">MAX VERSTAPPEN</div>
-      <h1 className="font-light text-6xl">Manrope Light</h1>
-      <h1 className="font-manrope font-bold">Manrope Bold</h1>
       <div className="WRAPPER grid grid-cols-2 gap-4 w-full">
+        
         <div className='LEFTHALF'>
+          <div className='flex flex-row gap-2 justify-center items-center '>
+            <div className="w-1/4 mt-2">
+              <p style={{fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Top Stats</p>
+            </div>
+            <div className="w-3/4">
+              <img src={bannerRed} alt="Line Chart Icon" className="w-full" />
+            </div>
+          </div>
           <div className='OVERVIEWNUMBER grid gap-4 grid-cols-3'>
             <div>
               <StatCard value="150" label="Total Users" />
@@ -116,28 +123,32 @@ function App() {
               <StatCard value="150" label="Total Users" />
             </div>
           </div>
-          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
-            <DonutChartCard
-              title="Wins by Team"
-              chartData={chartData1}
-              chartOptions={chartOptions1}
-            />
-            <DonutChartCard
-              title="Wins by Driver"
-              chartData={chartData2}
-              chartOptions={chartOptions2}
-            />
-          </div>
+
           <div className='LINECHART mt-4 grid grid-cols-1'>
             <LineChartCard 
-              title="Linechar"
+              title="Driver Fights"
               chartData={lineChartData}
               chartOptions={lineChartOptions}
             />
           </div>
+
         </div>
+
         <div className='RIGHTHALF grid grid-cols-1'>
-          <TableCard title="User Information" columns={columns} data={data} />
+          <TableCard title="Driver Standings" columns={columns} data={data} />
+
+          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
+            <DonutChartCard
+              title="Win(s) by Driver"
+              chartData={chartData1}
+              chartOptions={chartOptions1}
+            />
+            <DonutChartCard
+              title="Pole(s) by Driver"
+              chartData={chartData2}
+              chartOptions={chartOptions2}
+            />
+          </div>
         </div>
       </div>
     </div>

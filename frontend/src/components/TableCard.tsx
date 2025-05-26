@@ -11,7 +11,7 @@ const TableCard: React.FC<TableCardProps> = ({ title, columns, data }) => {
   return (
     <div className="bg-white">
       <div className='rounded-tr-2xl border-t-1 border-r-1 border-slate-300'>
-        <h2 className="text-2xl font-bold mb-4 pt-2 pl-2">{title}</h2>
+        <h2 style={{fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">{title}</h2>
       </div>
       <div>
         <table className="min-w-full divide-y divide-gray-200 font-semibold mb-4 pt-2 pl-2">
