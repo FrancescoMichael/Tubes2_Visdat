@@ -4,6 +4,7 @@ import type { ChartOptions } from 'chart.js'
 import LineChartCard from './components/LineChartCard'
 import TableCard from './components/TableCard'
 import StatCard from './components/StatCard'
+import "./assets/fonts/Formula1-Regular_web_0.ttf";
 
 const chartData1: ChartData<'doughnut'> = {
   labels: ['Red Bull Racing', 'McLaren', 'Ferrari', 'Mercedes'],
@@ -99,7 +100,7 @@ const data = [
 function App() {
   return (
     <div className="bg-white p-6">
-      <div className="text-6xl">MAX VERSTAPPEN</div>
+      <div style={{ color: "#1139b9", fontFamily: "RubikScribble" }} className="text-6xl">MAX VERSTAPPEN</div>
       <h1 className="font-light text-6xl">Manrope Light</h1>
       <h1 className="font-manrope font-bold">Manrope Bold</h1>
       <div className="WRAPPER grid grid-cols-2 gap-4 w-full">
