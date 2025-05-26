@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint
 from app.services.standings_service import get_standings, get_driver_standings, get_constructor_standings
 
 standings_bp = Blueprint('standings', __name__)

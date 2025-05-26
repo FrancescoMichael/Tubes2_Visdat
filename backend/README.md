@@ -9,3 +9,9 @@ http://localhost:5000/api/standings/2021
 
 # Get all available years
 http://localhost:5000/api/years
+
+http://localhost:5000/api/journeys/drivers/2024
+
+http://localhost:5000/api/journeys/constructors/2024
+
+http://localhost:5000/api/stats/poles/2024
