@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from datetime import datetime
 import os
 from app import create_app
@@ -10,13 +9,11 @@ def clean_data(df):
     df = df.replace(r'\N', None)
     df = df.replace('', None)
     
-    # Replace NaN with None
     df = df.where(pd.notna(df), None)
     
     return df
 
 def table_exists_and_has_data(model):
-    """Check if table exists and has data"""
     try:
         count = db.session.query(model).count()
         return count > 0
@@ -24,7 +21,6 @@ def table_exists_and_has_data(model):
         return False
 
 def import_drivers():
-    """Import drivers data with duplicate handling"""
     if table_exists_and_has_data(Driver):
         print(" Drivers table already has data, skipping...")
         return
@@ -35,7 +31,6 @@ def import_drivers():
     
     try:
         for _, row in df.iterrows():
-            # Check if driver already exists
             existing = Driver.query.filter_by(driverId=row['driverId']).first()
             if not existing:
                 driver = Driver(
@@ -59,7 +54,6 @@ def import_drivers():
         raise
 
 def import_constructors():
-    """Import constructors data with duplicate handling"""
     if table_exists_and_has_data(Constructor):
         print(" Constructors table already has data, skipping...")
         return
@@ -70,7 +64,6 @@ def import_constructors():
     
     try:
         for _, row in df.iterrows():
-            # Check if constructor already exists
             existing = Constructor.query.filter_by(constructorId=row['constructorId']).first()
             if not existing:
                 constructor = Constructor(
@@ -90,7 +83,6 @@ def import_constructors():
         raise
 
 def import_races():
-    """Import races data with duplicate handling"""
     if table_exists_and_has_data(Race):
         print(" Races table already has data, skipping...")
         return
@@ -101,7 +93,6 @@ def import_races():
     
     try:
         for _, row in df.iterrows():
-            # Check if race already exists
             existing = Race.query.filter_by(raceId=row['raceId']).first()
             if not existing:
                 race = Race(
@@ -124,7 +115,6 @@ def import_races():
         raise
 
 def import_results():
-    """Import race results data with duplicate handling"""
     if table_exists_and_has_data(Result):
         print(" Results table already has data, skipping...")
         return
@@ -139,7 +129,6 @@ def import_results():
             batch = df.iloc[i:i+batch_size]
             
             for _, row in batch.iterrows():
-                # Check if result already exists
                 existing = Result.query.filter_by(resultId=row['resultId']).first()
                 if not existing:
                     result = Result(
@@ -174,7 +163,6 @@ def import_results():
         raise
 
 def import_driver_standings():
-    """Import driver standings data with duplicate handling"""
     if table_exists_and_has_data(DriverStanding):
         print(" Driver standings table already has data, skipping...")
         return
@@ -189,7 +177,6 @@ def import_driver_standings():
             batch = df.iloc[i:i+batch_size]
             
             for _, row in batch.iterrows():
-                # Check if standing already exists
                 existing = DriverStanding.query.filter_by(driverStandingsId=row['driverStandingsId']).first()
                 if not existing:
                     standing = DriverStanding(
@@ -213,7 +200,6 @@ def import_driver_standings():
         raise
 
 def import_constructor_standings():
-    """Import constructor standings data with duplicate handling"""
     if table_exists_and_has_data(ConstructorStanding):
         print(" Constructor standings table already has data, skipping...")
         return
@@ -228,7 +214,6 @@ def import_constructor_standings():
             batch = df.iloc[i:i+batch_size]
             
             for _, row in batch.iterrows():
-                # Check if standing already exists
                 existing = ConstructorStanding.query.filter_by(constructorStandingsId=row['constructorStandingsId']).first()
                 if not existing:
                     standing = ConstructorStanding(
@@ -252,7 +237,6 @@ def import_constructor_standings():
         raise
 
 def clear_all_data():
-    """Clear all data from tables (use with caution!)"""
     print("⚠️  Clearing all data from database...")
     try:
         db.session.query(ConstructorStanding).delete()
@@ -269,7 +253,6 @@ def clear_all_data():
         raise
 
 def check_data_files():
-    """Check if all required CSV files exist"""
     required_files = [
         'data/drivers.csv',
         'data/constructors.csv', 
@@ -294,11 +277,9 @@ def check_data_files():
     return True
 
 def main():
-    """Main import function"""
-    print("🏎️  Formula 1 Data Import Script")
+    print("Formula 1 Data Import Script")
     print("=" * 40)
     
-    # Check if CSV files exist
     if not check_data_files():
         print("\n Please ensure all CSV files are in the 'data/' directory")
         return
@@ -310,7 +291,6 @@ def main():
             db.create_all()
             print(" Database tables created")
             
-            # Import data in order (respecting foreign key constraints)
             import_drivers()
             import_constructors()
             import_races()
@@ -319,7 +299,7 @@ def main():
             import_constructor_standings()
             
             print("\n" + "=" * 40)
-            print("🎉 Data import completed successfully!")
+            print("Data import completed successfully!")
             print("\nDatabase Summary:")
             print(f"   - Drivers: {Driver.query.count()}")
             print(f"   - Constructors: {Constructor.query.count()}")
@@ -336,6 +316,4 @@ def main():
             raise
 
 if __name__ == '__main__':
-    # Uncomment the next line if you want to clear all data and start fresh
-    # clear_all_data()
     main()
