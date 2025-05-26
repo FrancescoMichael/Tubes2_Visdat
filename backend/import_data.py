@@ -1,0 +1,341 @@
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import os
+from app import create_app
+from models import db, Driver, Constructor, Race, DriverStanding, ConstructorStanding, Result
+
+def clean_data(df):
+    df = df.replace('\\N', None)
+    df = df.replace(r'\N', None)
+    df = df.replace('', None)
+    
+    # Replace NaN with None
+    df = df.where(pd.notna(df), None)
+    
+    return df
+
+def table_exists_and_has_data(model):
+    """Check if table exists and has data"""
+    try:
+        count = db.session.query(model).count()
+        return count > 0
+    except:
+        return False
+
+def import_drivers():
+    """Import drivers data with duplicate handling"""
+    if table_exists_and_has_data(Driver):
+        print(" Drivers table already has data, skipping...")
+        return
+        
+    print("Importing drivers...")
+    df = pd.read_csv('data/drivers.csv')
+    df = clean_data(df)
+    
+    try:
+        for _, row in df.iterrows():
+            # Check if driver already exists
+            existing = Driver.query.filter_by(driverId=row['driverId']).first()
+            if not existing:
+                driver = Driver(
+                    driverId=row['driverId'],
+                    driverRef=row['driverRef'],
+                    number=int(row['number']) if row['number'] is not None else None,
+                    code=row['code'],
+                    forename=row['forename'],
+                    surname=row['surname'],
+                    dob=datetime.strptime(row['dob'], '%Y-%m-%d').date() if row['dob'] else None,
+                    nationality=row['nationality'],
+                    url=row['url']
+                )
+                db.session.add(driver)
+        
+        db.session.commit()
+        print(f" Successfully imported {len(df)} drivers")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing drivers: {e}")
+        raise
+
+def import_constructors():
+    """Import constructors data with duplicate handling"""
+    if table_exists_and_has_data(Constructor):
+        print(" Constructors table already has data, skipping...")
+        return
+        
+    print("Importing constructors...")
+    df = pd.read_csv('data/constructors.csv')
+    df = clean_data(df)
+    
+    try:
+        for _, row in df.iterrows():
+            # Check if constructor already exists
+            existing = Constructor.query.filter_by(constructorId=row['constructorId']).first()
+            if not existing:
+                constructor = Constructor(
+                    constructorId=row['constructorId'],
+                    constructorRef=row['constructorRef'],
+                    name=row['name'],
+                    nationality=row['nationality'],
+                    url=row['url']
+                )
+                db.session.add(constructor)
+        
+        db.session.commit()
+        print(f" Successfully imported {len(df)} constructors")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing constructors: {e}")
+        raise
+
+def import_races():
+    """Import races data with duplicate handling"""
+    if table_exists_and_has_data(Race):
+        print(" Races table already has data, skipping...")
+        return
+        
+    print("Importing races...")
+    df = pd.read_csv('data/races.csv')
+    df = clean_data(df)
+    
+    try:
+        for _, row in df.iterrows():
+            # Check if race already exists
+            existing = Race.query.filter_by(raceId=row['raceId']).first()
+            if not existing:
+                race = Race(
+                    raceId=row['raceId'],
+                    year=int(row['year']),
+                    round=int(row['round']),
+                    circuitId=int(row['circuitId']),
+                    name=row['name'],
+                    date=datetime.strptime(row['date'], '%Y-%m-%d').date() if row['date'] else None,
+                    time=row['time'],
+                    url=row['url']
+                )
+                db.session.add(race)
+        
+        db.session.commit()
+        print(f" Successfully imported {len(df)} races")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing races: {e}")
+        raise
+
+def import_results():
+    """Import race results data with duplicate handling"""
+    if table_exists_and_has_data(Result):
+        print(" Results table already has data, skipping...")
+        return
+        
+    print("Importing race results...")
+    df = pd.read_csv('data/results.csv')
+    df = clean_data(df)
+    
+    try:
+        batch_size = 1000
+        for i in range(0, len(df), batch_size):
+            batch = df.iloc[i:i+batch_size]
+            
+            for _, row in batch.iterrows():
+                # Check if result already exists
+                existing = Result.query.filter_by(resultId=row['resultId']).first()
+                if not existing:
+                    result = Result(
+                        resultId=row['resultId'],
+                        raceId=int(row['raceId']),
+                        driverId=int(row['driverId']),
+                        constructorId=int(row['constructorId']),
+                        number=int(row['number']) if row['number'] is not None else None,
+                        grid=int(row['grid']) if row['grid'] is not None else None,
+                        position=int(row['position']) if row['position'] is not None else None,
+                        positionText=row['positionText'],
+                        positionOrder=int(row['positionOrder']),
+                        points=float(row['points']) if row['points'] is not None else 0.0,
+                        laps=int(row['laps']) if row['laps'] is not None else 0,
+                        time=row['time'],
+                        milliseconds=int(row['milliseconds']) if row['milliseconds'] is not None else None,
+                        fastestLap=int(row['fastestLap']) if row['fastestLap'] is not None else None,
+                        rank=int(row['rank']) if row['rank'] is not None else None,
+                        fastestLapTime=row['fastestLapTime'],
+                        fastestLapSpeed=float(row['fastestLapSpeed']) if row['fastestLapSpeed'] is not None else None,
+                        statusId=int(row['statusId'])
+                    )
+                    db.session.add(result)
+            
+            db.session.commit()
+            print(f" Imported batch {i//batch_size + 1}: {len(batch)} results")
+        
+        print(f" Successfully imported all race results")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing results: {e}")
+        raise
+
+def import_driver_standings():
+    """Import driver standings data with duplicate handling"""
+    if table_exists_and_has_data(DriverStanding):
+        print(" Driver standings table already has data, skipping...")
+        return
+        
+    print("Importing driver standings...")
+    df = pd.read_csv('data/driver_standings.csv')
+    df = clean_data(df)
+    
+    try:
+        batch_size = 1000
+        for i in range(0, len(df), batch_size):
+            batch = df.iloc[i:i+batch_size]
+            
+            for _, row in batch.iterrows():
+                # Check if standing already exists
+                existing = DriverStanding.query.filter_by(driverStandingsId=row['driverStandingsId']).first()
+                if not existing:
+                    standing = DriverStanding(
+                        driverStandingsId=row['driverStandingsId'],
+                        raceId=int(row['raceId']),
+                        driverId=int(row['driverId']),
+                        points=float(row['points']) if row['points'] is not None else 0.0,
+                        position=int(row['position']) if row['position'] is not None else None,
+                        positionText=row['positionText'],
+                        wins=int(row['wins']) if row['wins'] is not None else 0
+                    )
+                    db.session.add(standing)
+            
+            db.session.commit()
+            print(f" Imported batch {i//batch_size + 1}: {len(batch)} driver standings")
+        
+        print(f" Successfully imported all driver standings")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing driver standings: {e}")
+        raise
+
+def import_constructor_standings():
+    """Import constructor standings data with duplicate handling"""
+    if table_exists_and_has_data(ConstructorStanding):
+        print(" Constructor standings table already has data, skipping...")
+        return
+        
+    print("Importing constructor standings...")
+    df = pd.read_csv('data/constructor_standings.csv')
+    df = clean_data(df)
+    
+    try:
+        batch_size = 1000
+        for i in range(0, len(df), batch_size):
+            batch = df.iloc[i:i+batch_size]
+            
+            for _, row in batch.iterrows():
+                # Check if standing already exists
+                existing = ConstructorStanding.query.filter_by(constructorStandingsId=row['constructorStandingsId']).first()
+                if not existing:
+                    standing = ConstructorStanding(
+                        constructorStandingsId=row['constructorStandingsId'],
+                        raceId=int(row['raceId']),
+                        constructorId=int(row['constructorId']),
+                        points=float(row['points']) if row['points'] is not None else 0.0,
+                        position=int(row['position']) if row['position'] is not None else None,
+                        positionText=row['positionText'],
+                        wins=int(row['wins']) if row['wins'] is not None else 0
+                    )
+                    db.session.add(standing)
+            
+            db.session.commit()
+            print(f" Imported batch {i//batch_size + 1}: {len(batch)} constructor standings")
+        
+        print(f" Successfully imported all constructor standings")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing constructor standings: {e}")
+        raise
+
+def clear_all_data():
+    """Clear all data from tables (use with caution!)"""
+    print("⚠️  Clearing all data from database...")
+    try:
+        db.session.query(ConstructorStanding).delete()
+        db.session.query(DriverStanding).delete()
+        db.session.query(Result).delete()
+        db.session.query(Race).delete()
+        db.session.query(Constructor).delete()
+        db.session.query(Driver).delete()
+        db.session.commit()
+        print(" All data cleared successfully")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error clearing data: {e}")
+        raise
+
+def check_data_files():
+    """Check if all required CSV files exist"""
+    required_files = [
+        'data/drivers.csv',
+        'data/constructors.csv', 
+        'data/races.csv',
+        'data/results.csv',
+        'data/driver_standings.csv',
+        'data/constructor_standings.csv'
+    ]
+    
+    missing_files = []
+    for file in required_files:
+        if not os.path.exists(file):
+            missing_files.append(file)
+    
+    if missing_files:
+        print(" Missing required files:")
+        for file in missing_files:
+            print(f"   - {file}")
+        return False
+    
+    print(" All required CSV files found")
+    return True
+
+def main():
+    """Main import function"""
+    print("🏎️  Formula 1 Data Import Script")
+    print("=" * 40)
+    
+    # Check if CSV files exist
+    if not check_data_files():
+        print("\n Please ensure all CSV files are in the 'data/' directory")
+        return
+    
+    app = create_app()
+    with app.app_context():
+        try:
+            print("\nCreating database tables...")
+            db.create_all()
+            print(" Database tables created")
+            
+            # Import data in order (respecting foreign key constraints)
+            import_drivers()
+            import_constructors()
+            import_races()
+            import_results()
+            import_driver_standings()
+            import_constructor_standings()
+            
+            print("\n" + "=" * 40)
+            print("🎉 Data import completed successfully!")
+            print("\nDatabase Summary:")
+            print(f"   - Drivers: {Driver.query.count()}")
+            print(f"   - Constructors: {Constructor.query.count()}")
+            print(f"   - Races: {Race.query.count()}")
+            print(f"   - Results: {Result.query.count()}")
+            print(f"   - Driver Standings: {DriverStanding.query.count()}")
+            print(f"   - Constructor Standings: {ConstructorStanding.query.count()}")
+            
+        except Exception as e:
+            print(f"\n Import failed: {e}")
+            print("\nIf you want to start fresh, you can:")
+            print("1. Delete the database file (f1_api.db)")
+            print("2. Or uncomment the clear_all_data() call below")
+            raise
+
+if __name__ == '__main__':
+    # Uncomment the next line if you want to clear all data and start fresh
+    # clear_all_data()
+    main()
