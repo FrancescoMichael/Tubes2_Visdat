@@ -91,11 +91,11 @@ const lineChartOptions: ChartOptions<'line'> = {
   }
 }
 
-const columns = ['Name', 'Age', 'Country']
+const columns = ['Position', 'Driver', 'Points']
 const data = [
-  ['Alice', 25, 'USA'],
-  ['Bob', 30, 'Canada'],
-  ['Charlie', 22, 'UK']
+    [1, 'Max Verstappen', 369],
+    [2, 'Lewis Hamilton', 305],
+    [3, 'Charles Leclerc', 279]
 ]
 
 function App() {
@@ -129,13 +129,16 @@ function App() {
               title="Driver Fights"
               chartData={lineChartData}
               chartOptions={lineChartOptions}
+              headingFontFamily='Formula1Bold'
+              legendFontFamily='Formula1Bold'
+              fontFamily="Formula1"
             />
           </div>
 
         </div>
 
         <div className='RIGHTHALF grid grid-cols-1'>
-          <TableCard title="Driver Standings" columns={columns} data={data} />
+          <TableCard title="Driver Standings" columns={columns} data={data} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14,16,14]}/>
 
           <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
             <DonutChartCard
