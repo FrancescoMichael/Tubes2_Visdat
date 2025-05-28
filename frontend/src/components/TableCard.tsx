@@ -33,8 +33,8 @@ const TableCard: React.FC<TableCardProps> = ({
   };
 
   return (
-    <div className="relative bg-white w-full">
-      <div className="rounded-tr-2xl border-t-1 border-r-1 border-slate-300">
+    <div className="relative w-full">
+      <div className="rounded-tr-2xl border-t-1 border-r-1 border-slate-300 mt-4">
         <h2
           style={{ fontFamily: headingFontFamily }}
           className="text-2xl font-bold mb-4 pt-2 pl-2"
@@ -61,7 +61,7 @@ const TableCard: React.FC<TableCardProps> = ({
                   {col}
                 </th>
               ))}
-            </tr>
+            </tr> 
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {paginatedData.map((row, rowIndex) => (

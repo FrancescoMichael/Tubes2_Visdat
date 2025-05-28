@@ -159,7 +159,7 @@ function App() {
     }
   }
 
-  const tableTitle = selectedView === 'Drivers' ? 'Driver Championship' : 'Constructor Championship'
+  const tableTitle = selectedView === 'Drivers' ? 'Driver Standing' : 'Constructor Standing'
 
   // Update URL when selectedYear changes
   useEffect(() => {
@@ -210,7 +210,7 @@ function App() {
 
           <div className='LINECHART mt-4 grid grid-cols-1'>
             <LineChartCard
-              title="Driver Fights"
+              title="Championship"
               chartData={lineChartData}
               chartOptions={lineChartOptions}
               headingFontFamily='Formula1Bold'
@@ -235,12 +235,12 @@ function App() {
 
           <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
             <DonutChartCard
-              title="Win(s) by Driver"
+              title="Race Win"
               chartData={chartData1}
               chartOptions={chartOptions1}
             />
             <DonutChartCard
-              title="Pole(s) by Driver"
+              title="Pole Position"
               chartData={chartData2}
               chartOptions={chartOptions2}
             />
