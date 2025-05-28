@@ -10,60 +10,20 @@ import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
 
-
-
-const chartData1: ChartData<'doughnut'> = {
-  labels: ['Red Bull Racing', 'McLaren', 'Ferrari', 'Mercedes'],
-  datasets: [
-    {
-      data: [8, 5, 4, 3],
-      backgroundColor: ['#1E41FF', '#FF8700', '#DC0000', '#00D2BE'],
-      hoverOffset: 10
-    }
-  ]
-};
-
 const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom'
+      position: 'right'
     }
   }
 }
-
-const chartData2: ChartData<'doughnut'> = {
-  labels: [
-    'Max Verstappen',
-    'Lando Norris',
-    'Charles Leclerc',
-    'Lewis Hamilton',
-    'Oscar Piastri',
-    'Carlos Sainz',
-    'George Russell'
-  ],
-  datasets: [
-    {
-      data: [9, 4, 3, 2, 2, 2, 2],
-      backgroundColor: [
-        '#1E41FF', // Red Bull Racing
-        '#FF8700', // McLaren
-        '#DC0000', // Ferrari
-        '#00D2BE', // Mercedes
-        '#FF8700', // McLaren
-        '#DC0000', // Ferrari
-        '#00D2BE'  // Mercedes
-      ],
-      hoverOffset: 10
-    }
-  ]
-};
 
 const chartOptions2: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom'
+      position: 'right'
     }
   }
 }
@@ -159,16 +119,79 @@ interface YearsResponse {
   years: number[]
 }
 
+interface PolesResponse {
+  stats: {
+    color: string,
+    driver_name: string,
+    poles: number,
+  }[]
+}
+
+interface WinsResponse {
+  stats: {
+    color: string,
+    driver_name: string,
+    wins: number,
+  }[]
+}
 
 function App() {
   const optionview = ['Drivers', 'Teams']
   const [selectedView, setSelectedView] = useState('Drivers')
   const [selectedYear, setSelectedYear] = useState('2024')
   const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/2024')
+  const [urlPoles, setUrlPoles] = useState('http://localhost:5000/api/stats/poles/2024')
+  const [urlWins, setUrlWins] = useState('http://localhost:5000/api/stats/wins/2024')
   const [urlJourneys, setUrlJourneys] = useState('http://localhost:5000/api/journeys/drivers/2024')
 
   const { data: years, loading, error } = useFetch<YearsResponse>('http://localhost:5000/api/years')
   const { data: standings, loading: loading1, error: error1 } = useFetch<StandingsResponse>(urlStandings)
+  const { data: polesData } = useFetch<PolesResponse>(urlPoles)
+  const { data: winsData } = useFetch<WinsResponse>(urlWins)
+
+  const getPolesChartData = (): ChartData<'doughnut'> => {
+    // Add null check before using polesData
+    if (!polesData || !polesData.stats || polesData.stats.length === 0) {
+      return {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [],
+        }]
+      }
+    }
+
+    return {
+      labels: polesData.stats.map(item => item.driver_name),
+      datasets: [{
+        data: polesData.stats.map(item => item.poles),
+        backgroundColor: polesData.stats.map(item => item.color),
+      }]
+    }
+  }
+
+  const getWinsChartData = (): ChartData<'doughnut'> => {
+    // Add null checks before using winsData
+    if (!winsData || !winsData.stats || winsData.stats.length === 0) {
+      return {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [],
+        }]
+      }
+    }
+
+    console.log(winsData)
+
+    return {
+      labels: winsData.stats.map(item => item.driver_name),
+      datasets: [{
+        data: winsData.stats.map(item => item.wins),
+        backgroundColor: winsData.stats.map(item => item.color), // Now using winsData colors
+      }]
+    }
+  }
   const { data: journeys, loading: loading2, error: error2 } = useFetch<JourneysResponse>(urlJourneys)
 
   const getTableData = () => {
@@ -218,6 +241,8 @@ function App() {
   useEffect(() => {
     if (selectedYear) {
       setUrlStandings(`http://localhost:5000/api/standings/${selectedYear}`)
+      setUrlPoles(`http://localhost:5000/api/stats/poles/${selectedYear}`)
+      setUrlWins(`http://localhost:5000/api/stats/wins/${selectedYear}`)
     }
   }, [selectedYear])
 
@@ -295,15 +320,15 @@ function App() {
 
           <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14, 16, 14]} />
 
-          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
+          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4 h-fit'>
             <DonutChartCard
-              title="Race Win"
-              chartData={chartData1}
+              title="Pole(s) by Driver"
+              chartData={getPolesChartData()}
               chartOptions={chartOptions1}
             />
             <DonutChartCard
-              title="Pole Position"
-              chartData={chartData2}
+              title="Win(s) by Driver"
+              chartData={getWinsChartData()}
               chartOptions={chartOptions2}
             />
           </div>
