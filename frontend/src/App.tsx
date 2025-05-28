@@ -9,6 +9,10 @@ import "./assets/fonts/Formula1-Regular_web_0.ttf";
 import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
+import type { PolesResponse, WinsResponse, YearsResponse } from './models/meta'
+import type { ConstructorStanding, DriverStanding } from './models/standing'
+import type { DriverJourneysResponse, ConstructorJourneyResponse } from './models/journey'
+import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STATS_POLES, API_STATS_WINS, API_YEARS } from './constant'
 
 const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
@@ -54,115 +58,22 @@ const lineChartOptions: ChartOptions<'line'> = {
 
 const columns = ['Position', 'Driver', 'Points']
 
-interface DriverStanding {
-  code: string;
-  driver_name: string;
-  rank: number;
-  team_name: string;
-  total_points: number;
-  wins: number;
-}
-
-interface ConstructorStanding {
-  nationality: string;
-  rank: number;
-  team_name: string;
-  total_points: number;
-  wins: number;
-}
-
-interface StandingsResponse {
-  constructors_championship: {
-    standings: ConstructorStanding[];
-    title: string;
-  };
-  drivers_championship: {
-    standings: DriverStanding[];
-    title: string;
-  };
-  year: number;
-}
-
-
-
-interface DriverJourney {
-  code: string;
-  driver_name: string;
-  final_points: number;
-  final_wins: number;
-  nationality: string;
-  points_journey: PointsEntry[];
-  rank: number;
-  team_name: string;
-}
-
-interface ConstructorJourney {
-  final_points: number;
-  final_wins: number;
-  name : string;
-  nationality: string;
-  points_journey: PointsEntry[];
-}
-
-interface PointsEntry {
-  cumulative_points: number;
-  date: string;
-  points: number;
-  points_this_race: number;
-  position: number;
-  race_name: string;
-  round: number;
-  wins: number;
-}
-
-interface ConstructorJourneysResponse {
-  constructors: ConstructorJourney[]; 
-  title: string;
-  year: number;
-}
-
-interface DriverJourneysResponse {
-  drivers: DriverJourney[]; 
-  title: string;
-  year: number;
-}
-
-interface YearsResponse {
-  years: number[]
-}
-
-interface PolesResponse {
-  stats: {
-    color: string,
-    driver_name: string,
-    poles: number,
-  }[]
-}
-
-interface WinsResponse {
-  stats: {
-    color: string,
-    driver_name: string,
-    wins: number,
-  }[]
-}
-
 function App() {
   const optionview = ['Drivers', 'Teams']
   const [selectedView, setSelectedView] = useState('Drivers')
   const [selectedYear, setSelectedYear] = useState('2024')
-  const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/2024')
-  const [urlPoles, setUrlPoles] = useState('http://localhost:5000/api/stats/poles/2024')
-  const [urlWins, setUrlWins] = useState('http://localhost:5000/api/stats/wins/2024')
-  const [urlJourneys, setUrlJourneys] = useState('http://localhost:5000/api/journeys/drivers/2024')
+  const [urlStandings, setUrlStandings] = useState(`${API_DRIVER_STANDINGS}/2024`)
+  const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/2024`)
+  const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/2024`)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [urlJourneys, setUrlJourneys] = useState(`${API_DRIVER_JOURNEYS}/2024`)
 
-  const { data: years, loading, error } = useFetch<YearsResponse>('http://localhost:5000/api/years')
-  const { data: standings, loading: loading1, error: error1 } = useFetch<StandingsResponse>(urlStandings)
+  const { data: years, loading, error } = useFetch<YearsResponse>(`${API_YEARS}`)
+  const { data: standings, loading: loading1, error: error1 } = useFetch<DriverStanding[] | ConstructorStanding[]>(urlStandings)
   const { data: polesData } = useFetch<PolesResponse>(urlPoles)
   const { data: winsData } = useFetch<WinsResponse>(urlWins)
 
   const getPolesChartData = (): ChartData<'doughnut'> => {
-    // Add null check before using polesData
     if (!polesData || !polesData.stats || polesData.stats.length === 0) {
       return {
         labels: [],
@@ -183,7 +94,6 @@ function App() {
   }
 
   const getWinsChartData = (): ChartData<'doughnut'> => {
-    // Add null checks before using winsData
     if (!winsData || !winsData.stats || winsData.stats.length === 0) {
       return {
         labels: [],
@@ -200,7 +110,7 @@ function App() {
       labels: winsData.stats.map(item => item.driver_name),
       datasets: [{
         data: winsData.stats.map(item => item.wins),
-        backgroundColor: winsData.stats.map(item => item.color), // Now using winsData colors
+        backgroundColor: winsData.stats.map(item => item.color),
       }]
     }
   }
@@ -209,19 +119,21 @@ function App() {
     data: journeys,
     loading: loading2,
     error: error2
-  } = useFetch<DriverJourneysResponse | ConstructorJourneysResponse>(urlJourneys);
+  } = useFetch<DriverJourneysResponse | ConstructorJourneyResponse>(urlJourneys);
 
   const getTableData = () => {
     if (!standings) return []
 
     if (selectedView === 'Drivers') {
-      return standings.drivers_championship?.standings?.map(driver => [
+      const drivers = standings as DriverStanding[]
+      return drivers.map(driver => [
         driver.rank,
         driver.driver_name,
         driver.total_points
-      ]) || []
-    } else {
-      return standings.constructors_championship?.standings?.map(team => [
+      ])
+    } else if (selectedView === 'Teams') {
+      const teams = standings as ConstructorStanding[]
+      return teams.map(team => [
         team.rank,
         team.team_name,
         team.total_points
@@ -229,92 +141,87 @@ function App() {
     }
   }
 
-const getLineChartData = (selectedView: string): ChartData<'line'> => {
-  if (!journeys) {
-    return {
-      labels: [],
-      datasets: []
-    }
-  }
-
-  if (selectedView === 'Drivers') {
-    // Type guard for DriverJourneysResponse
-    if ('drivers' in journeys && Array.isArray(journeys.drivers)) {
-      const data = journeys.drivers.map(journey => ({
-        label: journey.driver_name,
-        data: journey.points_journey.map(point => point.cumulative_points),
-        borderColor: '#1E41FF',
-        backgroundColor: 'rgba(30, 65, 255, 0.1)',
-        tension: 0.4,
-        fill: false
-      }))
-
-      return {
-        labels: journeys.drivers[0]?.points_journey.map(point => point.date) || [],
-        datasets: data
-      }
-    } else {
+  const getLineChartData = (selectedView: string): ChartData<'line'> => {
+    if (!journeys) {
       return {
         labels: [],
         datasets: []
       }
     }
-  } else {
-    // Type guard for ConstructorJourneysResponse
-    if ('constructors' in journeys && Array.isArray(journeys.constructors)) {
-      const data = journeys.constructors.map(journey => ({
-        label: journey.name,
-        data: journey.points_journey.map(point => point.cumulative_points),
-        borderColor: '#1E41FF',
-        backgroundColor: 'rgba(30, 65, 255, 0.1)',
-        tension: 0.4,
-        fill: false
-      }))
+    
+    if (selectedView === 'Drivers') {
+      // Type guard for DriverJourneysResponse
+      if ('drivers' in journeys && Array.isArray(journeys.drivers)) {
+        const data = journeys.drivers.map(journey => ({
+            label: journey.driver_name,
+            data: journey.points_journey.map(point => point.cumulative_points),
+            borderColor: '#1E41FF',
+            backgroundColor: 'rgba(30, 65, 255, 0.1)',
+            tension: 0.4,
+            fill: false
+          }))
 
-      return {
-        labels: journeys.constructors[0]?.points_journey.map(point => point.date) || [],
-        datasets: data
+        return {
+          labels: journeys.drivers[0]?.points_journey.map(point => point.date) || [],
+          datasets: data
+        }
+      } else {
+        return {
+          labels: [],
+          datasets: []
+        }
       }
     } else {
-      return {
-        labels: [],
-        datasets: []
+      // Type guard for ConstructorJourneyResponse
+      if ('constructors' in journeys && Array.isArray(journeys.constructors)) {
+        const data = journeys.constructors.map(journey => ({
+          label: journey.name,
+          data: journey.points_journey.map(point => point.cumulative_points),
+          borderColor: '#1E41FF',
+          backgroundColor: 'rgba(30, 65, 255, 0.1)',
+          tension: 0.4,
+          fill: false
+        }))
+
+        return {
+          labels: journeys.constructors[0]?.points_journey.map(point => point.date) || [],
+          datasets: data
+        }
+      } else {
+        return {
+          labels: [],
+          datasets: []
+        }
       }
     }
   }
-}
 
   const tableTitle = selectedView === 'Drivers' ? 'Driver Standing' : 'Constructor Standing'
 
-  // Update URL when selectedYear changes
+  // Combined useEffect for all URL updates
   useEffect(() => {
     if (selectedYear) {
-      setUrlStandings(`http://localhost:5000/api/standings/${selectedYear}`)
+      // Update standings URL
+      const standingsEndpoint = selectedView === 'Drivers' ? 'drivers' : 'constructors'
+      setUrlStandings(`http://localhost:5000/api/standings/${standingsEndpoint}/${selectedYear}`)
+      
+      // Update stats URLs
       setUrlPoles(`http://localhost:5000/api/stats/poles/${selectedYear}`)
       setUrlWins(`http://localhost:5000/api/stats/wins/${selectedYear}`)
+      
+      // Update journeys URL
+      const journeysEndpoint = selectedView === 'Drivers' ? 'drivers' : 'constructors'
+      setUrlJourneys(`http://localhost:5000/api/journeys/${journeysEndpoint}/${selectedYear}`)
+      
+      // Reset pagination
+      setCurrentPage(1)
     }
-  }, [selectedYear])
+  }, [selectedYear, selectedView])
 
-// Replace this useEffect:
-useEffect(() => {
-  if (selectedYear) {
-    setUrlJourneys(`http://localhost:5000/api/journeys/${(selectedView == "driver") ? "driver" : "constructors"}/${selectedYear}`)
-  }
-}, [selectedYear, selectedView])
-
-// With this corrected version:
-useEffect(() => {
-  if (selectedYear) {
-    const endpoint = selectedView === "Drivers" ? "drivers" : "constructors";
-    setUrlJourneys(`http://localhost:5000/api/journeys/${endpoint}/${selectedYear}`)
-  }
-}, [selectedYear, selectedView])
-  
-
-  if (loading || loading1 || loading2) return <p>Loading...</p>
+  if (loading || loading1) return <p>Loading...</p>
   if (error) return <p>Error loading years: {error}</p>
   if (error1) return <p>Error loading standings: {error1}</p>
-    if (error2) return <p>Error loading journeys: {urlJourneys}</p>
+  if (error2) return <p>Error loading journeys: {urlJourneys}</p>
   if (!years) return <p>No years available</p>
 
   return (
@@ -375,7 +282,16 @@ useEffect(() => {
             dropdownFontFamily="Formula1"
           />
 
-          <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14, 16, 14]} />
+          <TableCard
+            title={tableTitle}
+            columns={columns}
+            data={getTableData() ?? []}
+            headingFontFamily='Formula1Bold'
+            columnFonts={['Formula1', 'Formula1', 'Formula1']}
+            columnSizes={[14, 16, 14]}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
 
           <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4 h-fit'>
             <DonutChartCard

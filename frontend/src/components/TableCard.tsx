@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface TableCardProps {
   title: string;
@@ -7,6 +7,8 @@ interface TableCardProps {
   headingFontFamily?: string;
   columnFonts?: string[];
   columnSizes?: number[];
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 const TableCard: React.FC<TableCardProps> = ({
@@ -16,8 +18,9 @@ const TableCard: React.FC<TableCardProps> = ({
   headingFontFamily,
   columnFonts,
   columnSizes,
+  currentPage,
+  onPageChange,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
@@ -28,7 +31,7 @@ const TableCard: React.FC<TableCardProps> = ({
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      onPageChange(page);
     }
   };
 
@@ -61,7 +64,7 @@ const TableCard: React.FC<TableCardProps> = ({
                   {col}
                 </th>
               ))}
-            </tr> 
+            </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {paginatedData.map((row, rowIndex) => (
@@ -86,7 +89,10 @@ const TableCard: React.FC<TableCardProps> = ({
         </table>
 
         {/* Vertical Pagination */}
-        <div  style={{ fontFamily: headingFontFamily }} className="absolute top-24 right-2 flex flex-col items-center space-y-1">
+        <div
+          style={{ fontFamily: headingFontFamily }}
+          className="absolute top-24 right-2 flex flex-col items-center space-y-1"
+        >
           <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}

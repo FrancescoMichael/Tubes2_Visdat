@@ -14,15 +14,3 @@ export interface ConstructorStanding {
   total_points: number;
   wins: number;
 }
-
-export interface StandingsResponse {
-  constructors_championship: {
-    standings: ConstructorStanding[];
-    title: string;
-  };
-  drivers_championship: {
-    standings: DriverStanding[];
-    title: string;
-  };
-  year: number;
-}

@@ -116,11 +116,13 @@ def get_driver_standings(year):
         if not last_race:
             return jsonify({'error': f'No data available for year {year}'}), 404
         
+        # Query with position fallback
         standings_query = (
             db.session.query(
                 DriverStanding,
                 Driver,
-                Constructor
+                Constructor,
+                db.func.coalesce(DriverStanding.position, 0).label('calc_pos')
             )
             .join(Driver, DriverStanding.driverId == Driver.driverId)
             .join(
@@ -128,62 +130,29 @@ def get_driver_standings(year):
                 and_(
                     Result.driverId == DriverStanding.driverId,
                     Result.raceId == last_race.raceId
-                )
+                ),
+                isouter=True  # Use outer join in case results are missing
             )
-            .join(Constructor, Result.constructorId == Constructor.constructorId)
+            .join(Constructor, Result.constructorId == Constructor.constructorId, isouter=True)
             .filter(DriverStanding.raceId == last_race.raceId)
-            .order_by(DriverStanding.position)
+            .order_by('calc_pos')
             .all()
         )
         
-        if not standings_query:
-            standings_query = (
-                db.session.query(DriverStanding, Driver)
-                .join(Driver, DriverStanding.driverId == Driver.driverId)
-                .filter(DriverStanding.raceId == last_race.raceId)
-                .order_by(DriverStanding.position)
-                .all()
-            )
+        drivers = []
+        for idx, (ds, driver, constructor, calc_pos) in enumerate(standings_query, 1):
+            team_name = constructor.name if constructor else "Unknown Team"
+            code = driver.code or (driver.surname[:3].upper() if driver.surname else "UNK")
             
-            drivers = []
-            for ds, driver in standings_query:
-                recent_result = (
-                    db.session.query(Result, Constructor)
-                    .join(Constructor, Result.constructorId == Constructor.constructorId)
-                    .join(Race, Result.raceId == Race.raceId)
-                    .filter(
-                        and_(
-                            Result.driverId == driver.driverId,
-                            Race.year == year
-                        )
-                    )
-                    .order_by(Race.round.desc())
-                    .first()
-                )
-                
-                team_name = recent_result[1].name if recent_result else "Unknown Team"
-                
-                drivers.append({
-                    'rank': ds.position,
-                    'driver_name': f"{driver.forename} {driver.surname}",
-                    'team_name': team_name,
-                    'total_points': float(ds.points) if ds.points else 0,
-                    'wins': ds.wins or 0,
-                    'code': driver.code,
-                    'nationality': driver.nationality
-                })
-        else:
-            drivers = []
-            for ds, driver, constructor in standings_query:
-                drivers.append({
-                    'rank': ds.position,
-                    'driver_name': f"{driver.forename} {driver.surname}",
-                    'team_name': constructor.name,
-                    'total_points': float(ds.points) if ds.points else 0,
-                    'wins': ds.wins or 0,
-                    'code': driver.code,
-                    'nationality': driver.nationality
-                })
+            drivers.append({
+                'rank': ds.position if ds.position else idx,
+                'driver_name': f"{driver.forename} {driver.surname}",
+                'team_name': team_name,
+                'total_points': float(ds.points) if ds.points is not None else 0,
+                'wins': ds.wins if ds.wins is not None else 0,
+                'code': code,
+                'nationality': driver.nationality or "Unknown"
+            })
         
         return jsonify(drivers)
     
