@@ -71,7 +71,8 @@ def import_constructors():
                     constructorRef=row['constructorRef'],
                     name=row['name'],
                     nationality=row['nationality'],
-                    url=row['url']
+                    url=row['url'],
+                    color=row['color']
                 )
                 db.session.add(constructor)
         
@@ -91,20 +92,48 @@ def import_races():
     df = pd.read_csv('data/races.csv')
     df = clean_data(df)
     
+    def parse_time(time_str):
+        """Convert time string to Python time object"""
+        if time_str is None or pd.isna(time_str):
+            return None
+        try:
+            # Parse time string in format "HH:MM:SS"
+            return datetime.strptime(time_str, '%H:%M:%S').time()
+        except:
+            return None
+    
     try:
         for _, row in df.iterrows():
             existing = Race.query.filter_by(raceId=row['raceId']).first()
             if not existing:
-                race = Race(
-                    raceId=row['raceId'],
-                    year=int(row['year']),
-                    round=int(row['round']),
-                    circuitId=int(row['circuitId']),
-                    name=row['name'],
-                    date=datetime.strptime(row['date'], '%Y-%m-%d').date() if row['date'] else None,
-                    time=row['time'],
-                    url=row['url']
-                )
+                race_data = {
+                    'raceId': row['raceId'],
+                    'year': int(row['year']),
+                    'round': int(row['round']),
+                    'circuitId': int(row['circuitId']),
+                    'name': row['name'],
+                    'date': datetime.strptime(row['date'], '%Y-%m-%d').date() if row['date'] else None,
+                    'time': parse_time(row['time']),
+                    'url': row['url']
+                }
+                
+                # Add optional fields if they exist in the CSV
+                optional_fields = [
+                    'fp1_date', 'fp1_time', 'fp2_date', 'fp2_time', 
+                    'fp3_date', 'fp3_time', 'quali_date', 'quali_time',
+                    'sprint_date', 'sprint_time'
+                ]
+                
+                for field in optional_fields:
+                    if field in row:
+                        if field.endswith('_time'):
+                            race_data[field] = parse_time(row[field])
+                        elif field.endswith('_date'):
+                            race_data[field] = datetime.strptime(row[field], '%Y-%m-%d').date() if row[field] else None
+                        else:
+                            race_data[field] = row[field]
+                
+                race = Race(**race_data)
                 db.session.add(race)
         
         db.session.commit()

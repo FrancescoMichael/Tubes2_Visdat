@@ -8,6 +8,7 @@ class Constructor(db.Model):
     name = db.Column(db.String(255))
     nationality = db.Column(db.String(255))
     url = db.Column(db.String(255))
+    color = db.Column(db.String(10))
 
     def __repr__(self):
         return f'<Constructor {self.name}>'
