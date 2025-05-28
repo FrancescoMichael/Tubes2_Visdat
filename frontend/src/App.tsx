@@ -14,7 +14,7 @@ const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom'
+      position: 'right'
     }
   }
 }
@@ -23,7 +23,7 @@ const chartOptions2: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom'
+      position: 'right'
     }
   }
 }
@@ -110,7 +110,7 @@ interface WinsResponse {
 function App() {
   const optionview = ['Drivers', 'Teams']
   const [selectedView, setSelectedView] = useState('Drivers')
-  const [selectedYear, setSelectedYear] = useState('')
+  const [selectedYear, setSelectedYear] = useState('2024')
   const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/2024')
   const [urlPoles, setUrlPoles] = useState('http://localhost:5000/api/stats/poles/2024')
   const [urlWins, setUrlWins] = useState('http://localhost:5000/api/stats/wins/2024')
@@ -182,7 +182,7 @@ function App() {
     }
   }
 
-  const tableTitle = selectedView === 'Drivers' ? 'Driver Championship' : 'Constructor Championship'
+  const tableTitle = selectedView === 'Drivers' ? 'Driver Standing' : 'Constructor Standing'
 
   // Update URL when selectedYear changes
   useEffect(() => {
@@ -206,7 +206,7 @@ function App() {
           <div>
             <DropdownCard
               title="Select Year"
-              options={years.years.map((year: number) => year.toString()).reverse()}
+              options={years.years.map((year: number) => year.toString())}
               selectedOption={selectedYear}
               onChange={setSelectedYear}
               headingFontFamily="Formula1Bold"
@@ -235,7 +235,7 @@ function App() {
 
           <div className='LINECHART mt-4 grid grid-cols-1'>
             <LineChartCard
-              title="Driver Fights"
+              title="Championship"
               chartData={lineChartData}
               chartOptions={lineChartOptions}
               headingFontFamily='Formula1Bold'
@@ -258,7 +258,7 @@ function App() {
 
           <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14, 16, 14]} />
 
-          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
+          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4 h-fit'>
             <DonutChartCard
               title="Pole(s) by Driver"
               chartData={getPolesChartData()}
