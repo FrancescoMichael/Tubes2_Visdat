@@ -135,7 +135,7 @@ interface YearsResponse {
 function App() {
   const optionview = ['Drivers', 'Teams']
   const [selectedView, setSelectedView] = useState('Drivers')
-  const [selectedYear, setSelectedYear] = useState('')
+  const [selectedYear, setSelectedYear] = useState('2024')
   const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/2024')
 
   const { data: years, loading, error } = useFetch<YearsResponse>('http://localhost:5000/api/years')
@@ -181,7 +181,7 @@ function App() {
           <div>
             <DropdownCard
               title="Select Year"
-              options={years.years.map((year: number) => year.toString()).reverse()}
+              options={years.years.map((year: number) => year.toString())}
               selectedOption={selectedYear}
               onChange={setSelectedYear}
               headingFontFamily="Formula1Bold"
