@@ -14,7 +14,12 @@ const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'right'
+      position: 'right',
+      labels: {
+        font: {
+          size: 9,
+        },
+      }
     }
   }
 }
@@ -23,24 +28,15 @@ const chartOptions2: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'right'
+      position: 'right',
+      labels: {
+        font: {
+          size: 9,
+        },
+      }
     }
   }
 }
-
-// const lineChartData: ChartData<'line'> = {
-//   labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'],
-//   datasets: [
-//     {
-//       label: 'Progressive Data',
-//       data: [5, 7, 9, 8, 12, 15, 14, 18, 22, 21, 25, 28, 27, 31, 35, 33, 38, 42, 41, 45],
-//       borderColor: '#1E41FF',
-//       backgroundColor: 'rgba(30, 65, 255, 0.1)',
-//       tension: 0.4,
-//       fill: false
-//     }
-//   ]
-// }
 
 const lineChartOptions: ChartOptions<'line'> = {
   responsive: true,
@@ -87,6 +83,8 @@ interface StandingsResponse {
   year: number;
 }
 
+
+
 interface DriverJourney {
   code: string;
   driver_name: string;
@@ -96,6 +94,14 @@ interface DriverJourney {
   points_journey: PointsEntry[];
   rank: number;
   team_name: string;
+}
+
+interface ConstructorJourney {
+  final_points: number;
+  final_wins: number;
+  name : string;
+  nationality: string;
+  points_journey: PointsEntry[];
 }
 
 interface PointsEntry {
@@ -109,8 +115,14 @@ interface PointsEntry {
   wins: number;
 }
 
-interface JourneysResponse {
-  drivers: DriverJourney[];  // Direct array, not nested under another object
+interface ConstructorJourneysResponse {
+  constructors: ConstructorJourney[]; 
+  title: string;
+  year: number;
+}
+
+interface DriverJourneysResponse {
+  drivers: DriverJourney[]; 
   title: string;
   year: number;
 }
@@ -192,7 +204,12 @@ function App() {
       }]
     }
   }
-  const { data: journeys, loading: loading2, error: error2 } = useFetch<JourneysResponse>(urlJourneys)
+
+  const {
+    data: journeys,
+    loading: loading2,
+    error: error2
+  } = useFetch<DriverJourneysResponse | ConstructorJourneysResponse>(urlJourneys);
 
   const getTableData = () => {
     if (!standings) return []
@@ -212,26 +229,58 @@ function App() {
     }
   }
 
-  const getLineChartData = (): ChartData<'line'> => {
-  if (!journeys || !journeys.drivers.length) {  // Changed from journeys.drivers.journeys
+const getLineChartData = (selectedView: string): ChartData<'line'> => {
+  if (!journeys) {
     return {
       labels: [],
       datasets: []
     }
   }
 
-  const data = journeys.drivers.map(journey => ({  // Changed from journeys.drivers.journeys
-    label: journey.driver_name,
-    data: journey.points_journey.map(point => point.cumulative_points),
-    borderColor: '#1E41FF',
-    backgroundColor: 'rgba(30, 65, 255, 0.1)',
-    tension: 0.4,
-    fill: false
-  }))
+  if (selectedView === 'Drivers') {
+    // Type guard for DriverJourneysResponse
+    if ('drivers' in journeys && Array.isArray(journeys.drivers)) {
+      const data = journeys.drivers.map(journey => ({
+        label: journey.driver_name,
+        data: journey.points_journey.map(point => point.cumulative_points),
+        borderColor: '#1E41FF',
+        backgroundColor: 'rgba(30, 65, 255, 0.1)',
+        tension: 0.4,
+        fill: false
+      }))
 
-  return {
-    labels: journeys.drivers[0].points_journey.map(point => point.date),  // Changed from journeys.drivers.journeys[0]
-    datasets: data
+      return {
+        labels: journeys.drivers[0]?.points_journey.map(point => point.date) || [],
+        datasets: data
+      }
+    } else {
+      return {
+        labels: [],
+        datasets: []
+      }
+    }
+  } else {
+    // Type guard for ConstructorJourneysResponse
+    if ('constructors' in journeys && Array.isArray(journeys.constructors)) {
+      const data = journeys.constructors.map(journey => ({
+        label: journey.name,
+        data: journey.points_journey.map(point => point.cumulative_points),
+        borderColor: '#1E41FF',
+        backgroundColor: 'rgba(30, 65, 255, 0.1)',
+        tension: 0.4,
+        fill: false
+      }))
+
+      return {
+        labels: journeys.constructors[0]?.points_journey.map(point => point.date) || [],
+        datasets: data
+      }
+    } else {
+      return {
+        labels: [],
+        datasets: []
+      }
+    }
   }
 }
 
@@ -246,12 +295,20 @@ function App() {
     }
   }, [selectedYear])
 
-    // Update URL when selectedYear changes
-  useEffect(() => {
-    if (selectedYear) {
-      setUrlJourneys(`http://localhost:5000/api/journeys/${selectedView.toLowerCase()}/${selectedYear}`)
-    }
-  }, [selectedYear, selectedView])
+// Replace this useEffect:
+useEffect(() => {
+  if (selectedYear) {
+    setUrlJourneys(`http://localhost:5000/api/journeys/${(selectedView == "driver") ? "driver" : "constructors"}/${selectedYear}`)
+  }
+}, [selectedYear, selectedView])
+
+// With this corrected version:
+useEffect(() => {
+  if (selectedYear) {
+    const endpoint = selectedView === "Drivers" ? "drivers" : "constructors";
+    setUrlJourneys(`http://localhost:5000/api/journeys/${endpoint}/${selectedYear}`)
+  }
+}, [selectedYear, selectedView])
   
 
   if (loading || loading1 || loading2) return <p>Loading...</p>
@@ -298,7 +355,7 @@ function App() {
           <div className='LINECHART mt-4 grid grid-cols-1'>
             <LineChartCard
               title="Championship"
-              chartData={getLineChartData()}
+              chartData={getLineChartData(selectedView)}
               chartOptions={lineChartOptions}
               headingFontFamily='Formula1Bold'
               legendFontFamily='Formula1Bold'
