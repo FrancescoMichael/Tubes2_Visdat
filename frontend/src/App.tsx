@@ -27,7 +27,7 @@ const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom'
+      position: 'right'
     }
   }
 }
@@ -63,7 +63,7 @@ const chartOptions2: ChartOptions<'doughnut'> = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom'
+      position: 'right'
     }
   }
 }
@@ -233,7 +233,7 @@ function App() {
 
           <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14, 16, 14]} />
 
-          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
+          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4 h-fit'>
             <DonutChartCard
               title="Race Win"
               chartData={chartData1}

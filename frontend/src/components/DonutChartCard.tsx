@@ -61,7 +61,7 @@ const DonutChartCard: React.FC<DonutChartCardProps> = ({
           {title}
         </p>
       </div>
-      <div className="p-4">
+      <div className="-mt-20 text-xl">
         <Doughnut data={chartData} options={options} />
       </div>
     </div>
