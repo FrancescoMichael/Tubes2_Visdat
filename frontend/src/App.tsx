@@ -97,11 +97,6 @@ const lineChartOptions: ChartOptions<'line'> = {
 }
 
 const columns = ['Position', 'Driver', 'Points']
-// const data = [
-//     [1, 'Max Verstappen', 369],
-//     [2, 'Lewis Hamilton', 305],
-//     [3, 'Charles Leclerc', 279]
-// ]
 
 interface DriverStanding {
   code: string;
@@ -132,6 +127,10 @@ interface StandingsResponse {
   year: number;
 }
 
+interface YearsResponse {
+  years: number[]
+}
+
 
 function App() {
   const optionview = ['Drivers', 'Teams']
@@ -139,12 +138,12 @@ function App() {
   const [selectedYear, setSelectedYear] = useState('')
   const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/2024')
 
-  const { data: years, loading, error } = useFetch<string[]>('http://localhost:5000/api/years')
+  const { data: years, loading, error } = useFetch<YearsResponse>('http://localhost:5000/api/years')
   const { data: standings, loading: loading1, error: error1 } = useFetch<StandingsResponse>(urlStandings)
 
   const getTableData = () => {
     if (!standings) return []
-    
+
     if (selectedView === 'Drivers') {
       return standings.drivers_championship?.standings?.map(driver => [
         driver.rank,
@@ -161,7 +160,7 @@ function App() {
   }
 
   const tableTitle = selectedView === 'Drivers' ? 'Driver Championship' : 'Constructor Championship'
-  
+
   // Update URL when selectedYear changes
   useEffect(() => {
     if (selectedYear) {
@@ -177,12 +176,12 @@ function App() {
   return (
     <div className="bg-white p-6">
       <div className="WRAPPER grid grid-cols-2 gap-4 w-full">
-        
+
         <div className='LEFTHALF'>
           <div>
             <DropdownCard
               title="Select Year"
-              options={years}
+              options={years.years.map((year: number) => year.toString()).reverse()}
               selectedOption={selectedYear}
               onChange={setSelectedYear}
               headingFontFamily="Formula1Bold"
@@ -191,7 +190,7 @@ function App() {
           </div>
           <div className='flex flex-row gap-2 justify-center items-center '>
             <div className="w-1/4 mt-2">
-              <p style={{fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Top Stats</p>
+              <p style={{ fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Top Stats</p>
             </div>
             <div className="w-3/4">
               <img src={bannerRed} alt="Line Chart Icon" className="w-full" />
@@ -210,7 +209,7 @@ function App() {
           </div>
 
           <div className='LINECHART mt-4 grid grid-cols-1'>
-            <LineChartCard 
+            <LineChartCard
               title="Driver Fights"
               chartData={lineChartData}
               chartOptions={lineChartOptions}
@@ -223,16 +222,16 @@ function App() {
         </div>
 
         <div className='RIGHTHALF grid grid-cols-1'>
-           <DropdownCard
-              title="Select Category"
-              options={optionview}
-              selectedOption={selectedView}
-              onChange={setSelectedView}
-              headingFontFamily="Formula1Bold"
-              dropdownFontFamily="Formula1"
-            />
+          <DropdownCard
+            title="Select Category"
+            options={optionview}
+            selectedOption={selectedView}
+            onChange={setSelectedView}
+            headingFontFamily="Formula1Bold"
+            dropdownFontFamily="Formula1"
+          />
 
-          <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14,16,14]}/>
+          <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14, 16, 14]} />
 
           <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
             <DonutChartCard
