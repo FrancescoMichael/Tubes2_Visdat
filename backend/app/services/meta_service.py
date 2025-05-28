@@ -4,7 +4,7 @@ from models import db, Race
 def get_available_years():
     try:
         years = db.session.query(Race.year).distinct().order_by(Race.year.desc()).all()
-        return jsonify({[y[0] for y in years]})
+        return jsonify({'years': [y[0] for y in years]})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
