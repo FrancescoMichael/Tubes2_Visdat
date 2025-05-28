@@ -9,6 +9,10 @@ import "./assets/fonts/Formula1-Regular_web_0.ttf";
 import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
+import type { PolesResponse, WinsResponse, YearsResponse } from './models/meta'
+import type { ConstructorStanding, DriverStanding } from './models/standing'
+import type { JourneysResponse } from './models/journey'
+import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STATS_POLES, API_STATS_WINS, API_YEARS } from './constant'
 
 const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
@@ -44,82 +48,17 @@ const lineChartOptions: ChartOptions<'line'> = {
 
 const columns = ['Position', 'Driver', 'Points']
 
-interface DriverStanding {
-  code: string;
-  driver_name: string;
-  rank: number;
-  team_name: string;
-  total_points: number;
-  wins: number;
-}
-
-interface ConstructorStanding {
-  nationality: string;
-  rank: number;
-  team_name: string;
-  total_points: number;
-  wins: number;
-}
-
-interface DriverJourney {
-  code: string;
-  driver_name: string;
-  final_points: number;
-  final_wins: number;
-  nationality: string;
-  points_journey: PointsEntry[];
-  rank: number;
-  team_name: string;
-}
-
-interface PointsEntry {
-  cumulative_points: number;
-  date: string;
-  points: number;
-  points_this_race: number;
-  position: number;
-  race_name: string;
-  round: number;
-  wins: number;
-}
-
-interface JourneysResponse {
-  drivers: DriverJourney[];
-  title: string;
-  year: number;
-}
-
-interface YearsResponse {
-  years: number[]
-}
-
-interface PolesResponse {
-  stats: {
-    color: string,
-    driver_name: string,
-    poles: number,
-  }[]
-}
-
-interface WinsResponse {
-  stats: {
-    color: string,
-    driver_name: string,
-    wins: number,
-  }[]
-}
-
 function App() {
   const optionview = ['Drivers', 'Teams']
   const [selectedView, setSelectedView] = useState('Drivers')
   const [selectedYear, setSelectedYear] = useState('2024')
-  const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/drivers/2024')
-  const [urlPoles, setUrlPoles] = useState('http://localhost:5000/api/stats/poles/2024')
-  const [urlWins, setUrlWins] = useState('http://localhost:5000/api/stats/wins/2024')
+  const [urlStandings, setUrlStandings] = useState(`${API_DRIVER_STANDINGS}/2024`)
+  const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/2024`)
+  const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/2024`)
   const [currentPage, setCurrentPage] = useState(1)
-  const [urlJourneys, setUrlJourneys] = useState('http://localhost:5000/api/journeys/drivers/2024')
+  const [urlJourneys, setUrlJourneys] = useState(`${API_DRIVER_JOURNEYS}/2024`)
 
-  const { data: years, loading, error } = useFetch<YearsResponse>('http://localhost:5000/api/years')
+  const { data: years, loading, error } = useFetch<YearsResponse>(`${API_YEARS}`)
   const { data: standings, loading: loading1, error: error1 } = useFetch<DriverStanding[] | ConstructorStanding[]>(urlStandings)
   const { data: polesData } = useFetch<PolesResponse>(urlPoles)
   const { data: winsData } = useFetch<WinsResponse>(urlWins)
@@ -165,7 +104,7 @@ function App() {
       }]
     }
   }
-  const { data: journeys, loading: loading2, error: error2 } = useFetch<JourneysResponse>(urlJourneys)
+  const { data: journeys, error: error2 } = useFetch<JourneysResponse>(urlJourneys)
 
   const getTableData = () => {
     if (!standings) return []
@@ -296,7 +235,7 @@ function App() {
           <TableCard
             title={tableTitle}
             columns={columns}
-            data={getTableData()}
+            data={getTableData() ?? []}
             headingFontFamily='Formula1Bold'
             columnFonts={['Formula1', 'Formula1', 'Formula1']}
             columnSizes={[14, 16, 14]}
