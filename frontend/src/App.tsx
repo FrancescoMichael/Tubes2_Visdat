@@ -9,8 +9,8 @@ import "./assets/fonts/Formula1-Regular_web_0.ttf";
 import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
-import type { StandingsResponse } from './models/standing'
-import { API_CONSTRUCTOR_STANDINGS, API_DRIVER_STANDINGS, API_YEARS } from './constant'
+
+
 
 const chartData1: ChartData<'doughnut'> = {
   labels: ['Red Bull Racing', 'McLaren', 'Ferrari', 'Mercedes'],
@@ -103,49 +103,72 @@ const columns = ['Position', 'Driver', 'Points']
 //     [3, 'Charles Leclerc', 279]
 // ]
 
+interface DriverStanding {
+  code: string;
+  driver_name: string;
+  rank: number;
+  team_name: string;
+  total_points: number;
+  wins: number;
+}
+
+interface ConstructorStanding {
+  nationality: string;
+  rank: number;
+  team_name: string;
+  total_points: number;
+  wins: number;
+}
+
+interface StandingsResponse {
+  constructors_championship: {
+    standings: ConstructorStanding[];
+    title: string;
+  };
+  drivers_championship: {
+    standings: DriverStanding[];
+    title: string;
+  };
+  year: number;
+}
+
 
 function App() {
   const optionview = ['Drivers', 'Teams']
   const [selectedView, setSelectedView] = useState('Drivers')
-  const [selectedYear, setSelectedYear] = useState('2024')
-  const [urlStandings, setUrlStandings] = useState(`${API_DRIVER_STANDINGS}/${selectedYear}`)
+  const [selectedYear, setSelectedYear] = useState('')
+  const [urlStandings, setUrlStandings] = useState('http://localhost:5000/api/standings/2024')
 
-  const { data: years, loading, error } = useFetch<string[]>(`${API_YEARS}`)
+  const { data: years, loading, error } = useFetch<string[]>('http://localhost:5000/api/years')
   const { data: standings, loading: loading1, error: error1 } = useFetch<StandingsResponse>(urlStandings)
 
-  const getTableData = (): (string | number)[][] => {
-    if (!standings) return [];
-
+  const getTableData = () => {
+    if (!standings) return []
+    
     if (selectedView === 'Drivers') {
       return standings.drivers_championship?.standings?.map(driver => [
         driver.rank,
         driver.driver_name,
         driver.total_points
-      ]) || [];
+      ]) || []
+    } else {
+      return standings.constructors_championship?.standings?.map(team => [
+        team.rank,
+        team.team_name,
+        team.total_points
+      ]) || []
     }
-    return standings.constructors_championship?.standings?.map(team => [
-      team.rank,
-      team.team_name,
-      team.total_points
-    ]) || [];
   }
 
   const tableTitle = selectedView === 'Drivers' ? 'Driver Championship' : 'Constructor Championship'
-
+  
   // Update URL when selectedYear changes
-  const getStandingsUrl = (view: string, year: string): string => {
-    return view === 'Drivers'
-      ? `${API_DRIVER_STANDINGS}/${year}`
-      : `${API_CONSTRUCTOR_STANDINGS}/${year}`;
-  };
-
   useEffect(() => {
     if (selectedYear) {
-      setUrlStandings(getStandingsUrl(selectedView, selectedYear));
+      setUrlStandings(`http://localhost:5000/api/standings/${selectedYear}`)
     }
-  }, [selectedYear, selectedView]);
+  }, [selectedYear])
 
-  if (!standings) return <p>No standings data available</p>;
   if (loading || loading1) return <p>Loading...</p>
   if (error) return <p>Error loading years: {error}</p>
   if (error1) return <p>Error loading standings: {error1}</p>
@@ -154,7 +177,7 @@ function App() {
   return (
     <div className="bg-white p-6">
       <div className="WRAPPER grid grid-cols-2 gap-4 w-full">
-
+        
         <div className='LEFTHALF'>
           <div>
             <DropdownCard
@@ -168,7 +191,7 @@ function App() {
           </div>
           <div className='flex flex-row gap-2 justify-center items-center '>
             <div className="w-1/4 mt-2">
-              <p style={{ fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Top Stats</p>
+              <p style={{fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Top Stats</p>
             </div>
             <div className="w-3/4">
               <img src={bannerRed} alt="Line Chart Icon" className="w-full" />
@@ -187,7 +210,7 @@ function App() {
           </div>
 
           <div className='LINECHART mt-4 grid grid-cols-1'>
-            <LineChartCard
+            <LineChartCard 
               title="Driver Fights"
               chartData={lineChartData}
               chartOptions={lineChartOptions}
@@ -200,16 +223,16 @@ function App() {
         </div>
 
         <div className='RIGHTHALF grid grid-cols-1'>
-          <DropdownCard
-            title="Select Category"
-            options={optionview}
-            selectedOption={selectedView}
-            onChange={setSelectedView}
-            headingFontFamily="Formula1Bold"
-            dropdownFontFamily="Formula1"
-          />
+           <DropdownCard
+              title="Select Category"
+              options={optionview}
+              selectedOption={selectedView}
+              onChange={setSelectedView}
+              headingFontFamily="Formula1Bold"
+              dropdownFontFamily="Formula1"
+            />
 
-          <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14, 16, 14]} />
+          <TableCard title={tableTitle} columns={columns} data={getTableData()} headingFontFamily='Formula1Bold' columnFonts={['Formula1', 'Formula1', 'Formula1']} columnSizes={[14,16,14]}/>
 
           <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4'>
             <DonutChartCard
