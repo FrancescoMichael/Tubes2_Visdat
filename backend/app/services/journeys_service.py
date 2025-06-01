@@ -105,7 +105,7 @@ def get_top3_points_journey(year):
         for standing, race in all_standings:
             points_journey[standing.driverId].append({
                 'round': race.round,
-                'race_name': race.name,
+                'race_name': race.name.replace("Grand Prix", "GP"),
                 'date': race.date.isoformat() if race.date else None,
                 'position': standing.position,
                 'points': float(standing.points) if standing.points else 0,
@@ -209,7 +209,7 @@ def get_constructor_journeys(year):
         for standing, race in all_standings:
             points_journey[standing.constructorId].append({
                 'round': race.round,
-                'race_name': race.name,
+                'race_name': race.name.replace("Grand Prix", "GP"),
                 'date': race.date.isoformat() if race.date else None,
                 'position': standing.position,
                 'points': float(standing.points) if standing.points else 0,

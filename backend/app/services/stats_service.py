@@ -216,7 +216,7 @@ def get_team_stats_poles(year):
             team_id = constructor.constructorId
             if team_id not in pole_counts:
                 pole_counts[team_id] = {
-                    'team_name': constructor.name,
+                    'name': constructor.name,
                     'color': constructor.color,
                     'poles': 0
                 }

@@ -63,8 +63,8 @@ function App() {
   const [selectedView, setSelectedView] = useState('Drivers')
   const [selectedYear, setSelectedYear] = useState('2024')
   const [urlStandings, setUrlStandings] = useState(`${API_DRIVER_STANDINGS}/2024`)
-  const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/driver/2024`)
-  const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/driver/2024`)
+  const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/drivers/2024`)
+  const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/drivers/2024`)
   const [currentPage, setCurrentPage] = useState(1)
   const [urlJourneys, setUrlJourneys] = useState(`${API_DRIVER_JOURNEYS}/2024`)
 
@@ -83,6 +83,8 @@ function App() {
         }]
       }
     }
+
+    console.log("Poles data: ", polesData)
 
     return {
       labels: polesData.stats.map(item => item.name),
@@ -104,7 +106,7 @@ function App() {
       }
     }
 
-    console.log(winsData)
+    console.log("Win data: ", winsData)
 
     return {
       labels: winsData.stats.map(item => item.name),
@@ -160,7 +162,7 @@ function App() {
           }))
 
         return {
-          labels: journeys.drivers[0]?.points_journey.map(point => point.date) || [],
+          labels: journeys.drivers[0]?.points_journey.map(point => point.race_name) || [],
           datasets: data
         }
       } else {
@@ -182,7 +184,7 @@ function App() {
         }))
 
         return {
-          labels: journeys.constructors[0]?.points_journey.map(point => point.date) || [],
+          labels: journeys.constructors[0]?.points_journey.map(point => point.race_name) || [],
           datasets: data
         }
       } else {
