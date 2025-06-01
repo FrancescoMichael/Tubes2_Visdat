@@ -41,31 +41,35 @@ export default function View2({year}: View2Props) {
         <div className="WRAPPER grid grid-cols-2 gap-8 w-full p-6 pt-2">
             <div className='LEFTHALF'>
                 <div className="">
-                    <p style={{ fontFamily: "Formula1Bold" }} className="text-3xl font-bold mb-2 pt-2 pl-2">EVENT NAME</p>   
+                    <p style={{ fontFamily: "Formula1Bold" }} className="text-3xl font-bold mb-2 pt-2 pl-2">
+                        Australian Grand Prix
+                    </p>   
                 </div>
                 <div className="">
-                    <p style={{ fontFamily: "Formula1" }} className="text-xl mb-2 pt-2 pl-2">CIRCUIT NAME</p>   
+                    <p style={{ fontFamily: "Formula1" }} className="text-xl mb-2 pt-2 pl-2">
+                        Albert Park Grand Prix Circuit
+                    </p>   
                 </div>
                 <div className="border-t-10 border-r-10 border-red-500 rounded-tr-4xl pt-6 pr-6 flex items-center justify-between bg-white gap-2 ">
                     <div className="CIRCUITBANNER w-2/3 h-72">
                         <img src={circuit } alt="Line Chart Icon" className="w-full h-72 object-cover object-center" />
                     </div>
                     <div className='OVERVIEWNUMBER w-1/3 grid gap-8 grid-rows-2 h-72'>
-                        <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col">
                             <div className="">
-                                <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
+                                <div className="bg-white text-sm text-gray-500" style={{ fontFamily: "Formula1" }}>
                                     Location
                                 </div>
                                 <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
-                                    Melbourne, Australia
+                                    Melbourne
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col">
                             <div className="">
-                                <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
-                                    Lap Count
+                                <div className="bg-white text-sm text-gray-500" style={{ fontFamily: "Formula1" }}>
+                                    Number of Laps  
                                 </div>
                                 <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
                                     58
