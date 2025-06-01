@@ -31,19 +31,24 @@ export default function View2(string) {
                             <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
                             </div>
                         </div>
-                        <div className="">
-                            <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
-                            </div>
-                            <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
-                            </div>
-                        </div>
-                        <div className="">
-                            <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
-                            </div>
-                            <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
-                            </div>
-                        </div>
+                    </div>
 
+                    <div className="bg-white rounded-bl-2xl rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <div className="">
+                            <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
+                            </div>
+                            <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-white rounded-bl-2xl rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <div className="">
+                            <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
+                            </div>
+                            <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
