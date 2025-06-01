@@ -29,6 +29,8 @@ interface LineChartCardProps {
   headingFontFamily?: string
   legendFontFamily?: string
   fontFamily?: string
+  xAxisFontSize?: number
+  yAxisFontSize?: number
 }
 
 const LineChartCard: React.FC<LineChartCardProps> = ({
@@ -37,7 +39,9 @@ const LineChartCard: React.FC<LineChartCardProps> = ({
   chartOptions,
   headingFontFamily = 'Formula1Bold',
   legendFontFamily = 'Formula1Bold',
-  fontFamily = 'Formula1Bold'
+  fontFamily = 'Formula1Bold',
+  xAxisFontSize = 10,
+  yAxisFontSize = 12
 }) => {
   const options: ChartOptions<'line'> = {
     ...chartOptions,
@@ -77,14 +81,16 @@ const LineChartCard: React.FC<LineChartCardProps> = ({
         ...chartOptions?.scales?.x,
         ticks: {
           font: {
-            family: fontFamily
+            family: fontFamily,
+            size: xAxisFontSize
           },
           ...chartOptions?.scales?.x?.ticks
         },
         title: {
           ...chartOptions?.scales?.x?.title,
           font: {
-            family: fontFamily
+            family: fontFamily,
+            size: xAxisFontSize + 2 // Title sedikit lebih besar dari ticks
           }
         }
       },
@@ -92,14 +98,16 @@ const LineChartCard: React.FC<LineChartCardProps> = ({
         ...chartOptions?.scales?.y,
         ticks: {
           font: {
-            family: fontFamily
+            family: fontFamily,
+            size: yAxisFontSize
           },
           ...chartOptions?.scales?.y?.ticks
         },
         title: {
           ...chartOptions?.scales?.y?.title,
           font: {
-            family: fontFamily
+            family: fontFamily,
+            size: yAxisFontSize + 2 // Title sedikit lebih besar dari ticks
           }
         }
       }
