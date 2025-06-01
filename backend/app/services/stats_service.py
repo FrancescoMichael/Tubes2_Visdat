@@ -21,25 +21,47 @@ def get_season_summary(year):
             .count()
         )
 
-        # Unique drivers who won at least one race
-        unique_race_winners = (
+        # === DRIVER STATISTICS ===
+
+        unique_driver_race_winners = (
             db.session.query(distinct(Result.driverId))
             .join(Race, Result.raceId == Race.raceId)
             .filter(and_(Race.year == year, Result.position == 1))
             .count()
         )
 
-        # Unique drivers who started from pole (grid position 1)
-        unique_pole_sitters = (
+        unique_driver_pole_sitters = (
             db.session.query(distinct(Result.driverId))
             .join(Race, Result.raceId == Race.raceId)
             .filter(and_(Race.year == year, Result.grid == 1))
             .count()
         )
 
-        # Unique drivers who finished in top 3
-        unique_podium_finishers = (
+        unique_driver_podium_finishers = (
             db.session.query(distinct(Result.driverId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(and_(Race.year == year, Result.position.in_([1, 2, 3])))
+            .count()
+        )
+
+        # === TEAM STATISTICS ===
+
+        unique_team_race_winners = (
+            db.session.query(distinct(Result.constructorId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(and_(Race.year == year, Result.position == 1))
+            .count()
+        )
+
+        unique_team_pole_sitters = (
+            db.session.query(distinct(Result.constructorId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(and_(Race.year == year, Result.grid == 1))
+            .count()
+        )
+
+        unique_team_podium_finishers = (
+            db.session.query(distinct(Result.constructorId))
             .join(Race, Result.raceId == Race.raceId)
             .filter(and_(Race.year == year, Result.position.in_([1, 2, 3])))
             .count()
@@ -47,12 +69,20 @@ def get_season_summary(year):
 
         response = {
             'year': year,
+            'driver_summary': {
             'total_drivers': total_drivers,
+            'unique_driver_race_winners': unique_driver_race_winners,
+            'unique_driver_pole_sitters': unique_driver_pole_sitters,
+            'unique_driver_podium_finishers': unique_driver_podium_finishers,
+        },
+            'team_summary': {
             'total_teams': total_teams,
-            'unique_race_winners': unique_race_winners,
-            'unique_pole_sitters': unique_pole_sitters,
-            'unique_podium_finishers': unique_podium_finishers
+            'unique_team_race_winners': unique_team_race_winners,
+            'unique_team_pole_sitters': unique_team_pole_sitters,
+            'unique_team_podium_finishers': unique_team_podium_finishers
+        },
         }
+        
 
         return jsonify(response)
 

@@ -9,7 +9,7 @@ import "./assets/fonts/Formula1-Regular_web_0.ttf";
 import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
-import type { PolesResponse, SummaryResponse, WinsResponse, YearsResponse } from './models/meta'
+import type { DriverSummary, PolesResponse, SummaryResponse, TeamSummary, WinsResponse, YearsResponse } from './models/meta'
 import type { ConstructorStanding, DriverStanding } from './models/standing'
 import type { DriverJourneysResponse, ConstructorJourneyResponse } from './models/journey'
 import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STATS_POLES, API_STATS_SUMMARY, API_STATS_WINS, API_YEARS } from './constant'
@@ -75,55 +75,36 @@ function App() {
   const { data: winsData } = useFetch<WinsResponse>(urlWins)
   const { data: summaryData } = useFetch<SummaryResponse>(urlSummary)
 
-  const getNumberofDrivers = (): number => {
+  const getSummaryDriver = (): DriverSummary => {
     if (!summaryData || !summaryData){
-      return 0
+      return {
+        total_drivers: 0,
+        unique_driver_podium_finishers: 0,
+        unique_driver_pole_sitters: 0,
+        unique_driver_race_winners: 0,
+      }
     }
 
     else{
-      return summaryData.total_drivers
+      return summaryData.driver_summary
     }
   }
 
-  const getNumberofTeams = (): number => {
+  const getSummaryTeam = (): TeamSummary => {
     if (!summaryData || !summaryData){
-      return 0
+      return {
+        total_teams: 0,
+        unique_team_podium_finishers: 0,
+        unique_team_pole_sitters: 0,
+        unique_team_race_winners: 0,
+      }
     }
 
     else{
-      return summaryData.total_teams
+      return summaryData.team_summary
     }
   }
 
-  const getUniquePodiums = (): number => {
-    if (!summaryData || !summaryData){
-      return 0
-    }
-
-    
-    else{
-      return summaryData.unique_podium_finishers
-    }
-  }
-
-  // const getUniquePoleSitters = (): number => {
-  //   if (!summaryData || !summaryData){
-  //     return 0
-  //   }
-
-  //   else{
-  //     return summaryData.unique_pole_sitters
-  //   }
-  // }
-
-  const getUniqueRaceWinners = (): number => {
-    if (!summaryData || !summaryData){
-      return 0
-    }
-
-    else{
-      return summaryData.unique_race_winners
-    }}
 
   const getPolesChartData = (): ChartData<'doughnut'> => {
     if (!polesData || !polesData.stats || polesData.stats.length === 0) {
@@ -307,16 +288,16 @@ function App() {
           </div>
           <div className='OVERVIEWNUMBER grid gap-4 grid-cols-4'>
             <div>
-              <StatCard value={selectedView === 'Drivers' ? getNumberofDrivers().toString() : getNumberofTeams.toString()} label={`Total ${selectedView === 'Drivers' ? 'Drivers' : 'Teams'}`} />
+              <StatCard value={selectedView === 'Drivers' ? getSummaryDriver().total_drivers.toString() : getSummaryTeam().total_teams.toString()} label={`Total ${selectedView === 'Drivers' ? 'Drivers' : 'Teams'}`} />
             </div>
             <div>
-              <StatCard value={getUniqueRaceWinners().toString()} label="Total Unique Winners" />
+              <StatCard value={selectedView === 'Drivers' ? getSummaryDriver().unique_driver_race_winners.toString() : getSummaryTeam().unique_team_race_winners.toString()} label={`Unique Winner`} />
             </div>
             <div>
-              <StatCard value={getUniquePodiums().toString()} label="Total Unique Podium" />
+              <StatCard value={selectedView === 'Drivers' ? getSummaryDriver().unique_driver_podium_finishers.toString() :  getSummaryTeam().unique_team_podium_finishers.toString()} label={`Unique Podium`} />
             </div>
             <div>
-              <StatCard value={getUniquePodiums().toString()} label="Total Unique Pole" />
+              <StatCard value={selectedView === 'Drivers' ? getSummaryDriver().unique_driver_pole_sitters.toString() : getSummaryTeam().unique_team_pole_sitters.toString()} label={`Unique Pole`} />
             </div>
           </div>
 
