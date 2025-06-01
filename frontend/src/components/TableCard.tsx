@@ -9,6 +9,7 @@ interface TableCardProps {
   columnSizes?: number[];
   currentPage: number;
   onPageChange: (page: number) => void;
+  itemsPerPage?: number;
 }
 
 const TableCard: React.FC<TableCardProps> = ({
@@ -20,13 +21,15 @@ const TableCard: React.FC<TableCardProps> = ({
   columnSizes,
   currentPage,
   onPageChange,
+  itemsPerPage,
 }) => {
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  
+  const effectiveItemsPerPage = itemsPerPage ?? 5;
+  const totalPages = Math.ceil(data.length / effectiveItemsPerPage);
 
   const paginatedData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    (currentPage - 1) * effectiveItemsPerPage,
+    currentPage * effectiveItemsPerPage
   );
 
   const goToPage = (page: number) => {
@@ -68,7 +71,7 @@ const TableCard: React.FC<TableCardProps> = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {paginatedData.map((row, rowIndex) => {
-              const globalIndex = (currentPage - 1) * itemsPerPage + rowIndex;
+              const globalIndex = (currentPage - 1) * effectiveItemsPerPage + rowIndex;
               
               let bgColor = "hover:bg-gray-50";
               if (globalIndex === 0) {

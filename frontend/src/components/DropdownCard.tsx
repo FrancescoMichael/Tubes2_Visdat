@@ -28,7 +28,7 @@ const DropdownCard: React.FC<DropdownCardProps> = ({
     onChange(option);
     setIsOpen(false);
   };
-  const maxHeight = Math.min(options.length, 10) * 30 + 25;
+  const maxHeight = Math.min(options.length, 10) * 30 + 32;
 
   return (
     <div className="text-white p-4 w-full relative pt-2">
