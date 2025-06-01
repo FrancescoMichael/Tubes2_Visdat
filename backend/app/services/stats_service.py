@@ -1,6 +1,64 @@
 from flask import jsonify
 from models import db, Race, Result, Driver, Constructor
-from sqlalchemy import and_
+from sqlalchemy import and_, distinct
+
+
+def get_season_summary(year):
+    try:
+        # Unique drivers who participated in any race
+        total_drivers = (
+            db.session.query(distinct(Result.driverId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(Race.year == year)
+            .count()
+        )
+
+        # Unique constructors who participated in any race
+        total_teams = (
+            db.session.query(distinct(Result.constructorId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(Race.year == year)
+            .count()
+        )
+
+        # Unique drivers who won at least one race
+        unique_race_winners = (
+            db.session.query(distinct(Result.driverId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(and_(Race.year == year, Result.position == 1))
+            .count()
+        )
+
+        # Unique drivers who started from pole (grid position 1)
+        unique_pole_sitters = (
+            db.session.query(distinct(Result.driverId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(and_(Race.year == year, Result.grid == 1))
+            .count()
+        )
+
+        # Unique drivers who finished in top 3
+        unique_podium_finishers = (
+            db.session.query(distinct(Result.driverId))
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(and_(Race.year == year, Result.position.in_([1, 2, 3])))
+            .count()
+        )
+
+        response = {
+            'year': year,
+            'total_drivers': total_drivers,
+            'total_teams': total_teams,
+            'unique_race_winners': unique_race_winners,
+            'unique_pole_sitters': unique_pole_sitters,
+            'unique_podium_finishers': unique_podium_finishers
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 def get_driver_stats_win(year):
     try:

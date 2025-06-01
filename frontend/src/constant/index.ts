@@ -33,3 +33,4 @@ export const API_CONSTRUCTOR_JOURNEYS = `${API_BASE_URL}/journeys/constructors`;
 
 export const API_STATS_POLES = `${API_BASE_URL}/stats/poles`;
 export const API_STATS_WINS = `${API_BASE_URL}/stats/wins`;
+export const API_STATS_SUMMARY = `${API_BASE_URL}/stats/summary`;

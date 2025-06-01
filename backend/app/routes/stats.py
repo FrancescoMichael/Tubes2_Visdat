@@ -1,7 +1,11 @@
 from flask import Blueprint
-from app.services.stats_service import get_driver_stats_pole, get_driver_stats_win,get_team_stats_poles,get_team_stats_wins
+from app.services.stats_service import get_driver_stats_pole, get_driver_stats_win,get_team_stats_poles,get_team_stats_wins, get_season_summary
 
 stats_bp = Blueprint('stats', __name__)
+
+@stats_bp.route('/stats/summary/<int:year>', methods=['GET'])
+def stats_summary(year):
+    return get_season_summary(year)
 
 @stats_bp.route('/stats/poles/drivers/<int:year>', methods=['GET'])
 def stats_poles_driver(year):

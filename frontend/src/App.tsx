@@ -9,10 +9,10 @@ import "./assets/fonts/Formula1-Regular_web_0.ttf";
 import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
-import type { PolesResponse, WinsResponse, YearsResponse } from './models/meta'
+import type { PolesResponse, SummaryResponse, WinsResponse, YearsResponse } from './models/meta'
 import type { ConstructorStanding, DriverStanding } from './models/standing'
 import type { DriverJourneysResponse, ConstructorJourneyResponse } from './models/journey'
-import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STATS_POLES, API_STATS_WINS, API_YEARS } from './constant'
+import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STATS_POLES, API_STATS_SUMMARY, API_STATS_WINS, API_YEARS } from './constant'
 
 const chartOptions1: ChartOptions<'doughnut'> = {
   responsive: true,
@@ -65,6 +65,7 @@ function App() {
   const [urlStandings, setUrlStandings] = useState(`${API_DRIVER_STANDINGS}/2024`)
   const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/drivers/2024`)
   const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/drivers/2024`)
+  const [urlSummary, setUrlSummary] = useState(`${API_STATS_SUMMARY}/2024`)
   const [currentPage, setCurrentPage] = useState(1)
   const [urlJourneys, setUrlJourneys] = useState(`${API_DRIVER_JOURNEYS}/2024`)
 
@@ -72,6 +73,57 @@ function App() {
   const { data: standings, loading: loading1, error: error1 } = useFetch<DriverStanding[] | ConstructorStanding[]>(urlStandings)
   const { data: polesData } = useFetch<PolesResponse>(urlPoles)
   const { data: winsData } = useFetch<WinsResponse>(urlWins)
+  const { data: summaryData } = useFetch<SummaryResponse>(urlSummary)
+
+  const getNumberofDrivers = (): number => {
+    if (!summaryData || !summaryData){
+      return 0
+    }
+
+    else{
+      return summaryData.total_drivers
+    }
+  }
+
+  const getNumberofTeams = (): number => {
+    if (!summaryData || !summaryData){
+      return 0
+    }
+
+    else{
+      return summaryData.total_teams
+    }
+  }
+
+  const getUniquePodiums = (): number => {
+    if (!summaryData || !summaryData){
+      return 0
+    }
+
+    
+    else{
+      return summaryData.unique_podium_finishers
+    }
+  }
+
+  // const getUniquePoleSitters = (): number => {
+  //   if (!summaryData || !summaryData){
+  //     return 0
+  //   }
+
+  //   else{
+  //     return summaryData.unique_pole_sitters
+  //   }
+  // }
+
+  const getUniqueRaceWinners = (): number => {
+    if (!summaryData || !summaryData){
+      return 0
+    }
+
+    else{
+      return summaryData.unique_race_winners
+    }}
 
   const getPolesChartData = (): ChartData<'doughnut'> => {
     if (!polesData || !polesData.stats || polesData.stats.length === 0) {
@@ -172,7 +224,6 @@ function App() {
         }
       }
     } else {
-      // Type guard for ConstructorJourneyResponse
       if ('constructors' in journeys && Array.isArray(journeys.constructors)) {
         const data = journeys.constructors.map(journey => ({
           label: journey.name,
@@ -198,22 +249,18 @@ function App() {
 
   const tableTitle = selectedView === 'Drivers' ? 'Driver Standing' : 'Constructor Standing'
 
-  // Combined useEffect for all URL updates
   useEffect(() => {
     if (selectedYear) {
-      // Update standings URL
       const standingsEndpoint = selectedView === 'Drivers' ? 'drivers' : 'constructors'
       setUrlStandings(`http://localhost:5000/api/standings/${standingsEndpoint}/${selectedYear}`)
       
-      // Update stats URLs
       setUrlPoles(`http://localhost:5000/api/stats/poles/${standingsEndpoint}/${selectedYear}`)
       setUrlWins(`http://localhost:5000/api/stats/wins/${standingsEndpoint}/${selectedYear}`)
-      
-      // Update journeys URL
+      setUrlSummary(`http://localhost:5000/api/stats/summary/${selectedYear}`)
+
       const journeysEndpoint = selectedView === 'Drivers' ? 'drivers' : 'constructors'
       setUrlJourneys(`http://localhost:5000/api/journeys/${journeysEndpoint}/${selectedYear}`)
-      
-      // Reset pagination
+
       setCurrentPage(1)
     }
   }, [selectedYear, selectedView])
@@ -258,15 +305,18 @@ function App() {
               <img src={bannerRed} alt="Line Chart Icon" className="w-full" />
             </div>
           </div>
-          <div className='OVERVIEWNUMBER grid gap-4 grid-cols-3'>
+          <div className='OVERVIEWNUMBER grid gap-4 grid-cols-4'>
             <div>
-              <StatCard value="150" label="Total Users" />
+              <StatCard value={selectedView === 'Drivers' ? getNumberofDrivers().toString() : getNumberofTeams.toString()} label={`Total ${selectedView === 'Drivers' ? 'Drivers' : 'Teams'}`} />
             </div>
             <div>
-              <StatCard value="150" label="Total Users" />
+              <StatCard value={getUniqueRaceWinners().toString()} label="Total Unique Winners" />
             </div>
             <div>
-              <StatCard value="150" label="Total Users" />
+              <StatCard value={getUniquePodiums().toString()} label="Total Unique Podium" />
+            </div>
+            <div>
+              <StatCard value={getUniquePodiums().toString()} label="Total Unique Pole" />
             </div>
           </div>
 
