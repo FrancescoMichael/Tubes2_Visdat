@@ -28,12 +28,10 @@ const DropdownCard: React.FC<DropdownCardProps> = ({
     onChange(option);
     setIsOpen(false);
   };
-
-  // Calculate height for maximum 10 options (assuming ~40px per option)
   const maxHeight = Math.min(options.length, 10) * 30 + 25;
 
   return (
-    <div className="bg-white rounded-xl shadow p-4 w-full relative">
+    <div className="text-white p-4 w-full relative">
       <div className="mb-2">
         <label 
           htmlFor={`${title}-dropdown`} 
@@ -45,7 +43,7 @@ const DropdownCard: React.FC<DropdownCardProps> = ({
       </div>
       
       {/* Custom Dropdown */}
-      <div className="relative">
+      <div className="relative text-black">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}

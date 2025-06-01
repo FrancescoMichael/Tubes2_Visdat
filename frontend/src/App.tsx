@@ -225,10 +225,8 @@ function App() {
   if (!years) return <p>No years available</p>
 
   return (
-    <div className="bg-white p-6">
-      <div className="WRAPPER grid grid-cols-2 gap-4 w-full">
-
-        <div className='LEFTHALF'>
+    <div className="bg-white">
+      <div className="WRAPPER grid grid-cols-2 gap-4 w-full bg-red-600">
           <div>
             <DropdownCard
               title="Select Year"
@@ -239,6 +237,19 @@ function App() {
               dropdownFontFamily="Formula1"
             />
           </div>
+          <div className="">
+            <DropdownCard
+              title="Select Category"
+              options={optionview}
+              selectedOption={selectedView}
+              onChange={setSelectedView}
+              headingFontFamily="Formula1Bold"
+              dropdownFontFamily="Formula1"
+            />
+          </div>
+      </div>
+      <div className="WRAPPER grid grid-cols-2 gap-4 w-full p-6">
+        <div className='LEFTHALF'>
           <div className='flex flex-row gap-2 justify-center items-center '>
             <div className="w-1/4 mt-2">
               <p style={{ fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Top Stats</p>
@@ -273,15 +284,6 @@ function App() {
         </div>
 
         <div className='RIGHTHALF grid grid-cols-1'>
-          <DropdownCard
-            title="Select Category"
-            options={optionview}
-            selectedOption={selectedView}
-            onChange={setSelectedView}
-            headingFontFamily="Formula1Bold"
-            dropdownFontFamily="Formula1"
-          />
-
           <TableCard
             title={tableTitle}
             columns={columns}

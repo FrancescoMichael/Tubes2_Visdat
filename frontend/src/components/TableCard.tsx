@@ -72,16 +72,16 @@ const TableCard: React.FC<TableCardProps> = ({
               
               let bgColor = "hover:bg-gray-50";
               if (globalIndex === 0) {
-                bgColor = "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600";
+                bgColor = "bg-gradient-to-r from-yellow-300 to-yellow-400 hover:from-yellow-400 hover:to-yellow-500";
               } else if (globalIndex === 1) {
-                bgColor = "bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500"; 
+                bgColor = "bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400"; 
               } else if (globalIndex === 2) {
                 bgColor = "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"; 
               }
 
-              let textColor = "text-gray-600"; 
+              let textColor = "text-black"; 
               if (globalIndex <= 2) {
-                textColor = "text-white font-semibold";
+                textColor = "text-black font-semibold";
               }
 
               return (
