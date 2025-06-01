@@ -87,6 +87,19 @@ def get_top3_points_journey(year):
         
         driver_ids = [driver['driver_id'] for driver in top3_drivers]
         
+        all_race_results = (
+            db.session.query(Result, Race)
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(
+                and_(
+                    Result.driverId.in_(driver_ids),
+                    Race.year == year
+                )
+            )
+            .order_by(Race.round)
+            .all()
+        )
+        
         all_standings = (
             db.session.query(DriverStanding, Race)
             .join(Race, DriverStanding.raceId == Race.raceId)
@@ -102,12 +115,20 @@ def get_top3_points_journey(year):
         
         points_journey = {driver['driver_id']: [] for driver in top3_drivers}
         
+        race_results_map = {}
+        for result, race in all_race_results:
+            key = (result.driverId, race.raceId)
+            race_results_map[key] = result.position
+        
         for standing, race in all_standings:
+            race_position_key = (standing.driverId, race.raceId)
+            race_position = race_results_map.get(race_position_key, None)
+            
             points_journey[standing.driverId].append({
                 'round': race.round,
                 'race_name': race.name.replace("Grand Prix", "GP"),
                 'date': race.date.isoformat() if race.date else None,
-                'position': standing.position,
+                'position': race_position,
                 'points': float(standing.points) if standing.points else 0,
                 'wins': standing.wins or 0
             })
@@ -191,6 +212,29 @@ def get_constructor_journeys(year):
         
         constructor_ids = [c['constructor_id'] for c in constructors_data]
         
+        # Get constructor race results - best position per race
+        constructor_race_results = (
+            db.session.query(
+                Result.constructorId,
+                Race.raceId,
+                Race.round,
+                Race.name,
+                Race.date,
+                db.func.min(Result.position).label('best_position')
+            )
+            .join(Race, Result.raceId == Race.raceId)
+            .filter(
+                and_(
+                    Result.constructorId.in_(constructor_ids),
+                    Race.year == year,
+                    Result.position.isnot(None)
+                )
+            )
+            .group_by(Result.constructorId, Race.raceId, Race.round, Race.name, Race.date)
+            .order_by(Race.round)
+            .all()
+        )
+        
         all_standings = (
             db.session.query(ConstructorStanding, Race)
             .join(Race, ConstructorStanding.raceId == Race.raceId)
@@ -206,12 +250,25 @@ def get_constructor_journeys(year):
         
         points_journey = {c['constructor_id']: [] for c in constructors_data}
         
+        race_results_map = {}
+        for result in constructor_race_results:
+            key = (result.constructorId, result.raceId)
+            race_results_map[key] = {
+                'round': result.round,
+                'race_name': result.name.replace("Grand Prix", "GP"),
+                'date': result.date.isoformat() if result.date else None,
+                'best_position': result.best_position
+            }
+        
         for standing, race in all_standings:
+            key = (standing.constructorId, race.raceId)
+            race_data = race_results_map.get(key, {})
+            
             points_journey[standing.constructorId].append({
                 'round': race.round,
                 'race_name': race.name.replace("Grand Prix", "GP"),
                 'date': race.date.isoformat() if race.date else None,
-                'position': standing.position,
+                'position': race_data.get('best_position', None),
                 'points': float(standing.points) if standing.points else 0,
                 'wins': standing.wins or 0
             })
