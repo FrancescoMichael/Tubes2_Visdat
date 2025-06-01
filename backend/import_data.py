@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 import os
 from app import create_app
-from models import db, Driver, Constructor, Race, DriverStanding, ConstructorStanding, Result
+from models import db, Driver, Constructor, Race, DriverStanding, ConstructorStanding, Result, Circuit, Status
 
 def clean_data(df):
     df = df.replace('\\N', None)
@@ -51,6 +51,32 @@ def import_drivers():
     except Exception as e:
         db.session.rollback()
         print(f" Error importing drivers: {e}")
+        raise
+
+def import_statuses():
+    if table_exists_and_has_data(Status):
+        print(" Statuses table already has data, skipping...")
+        return
+        
+    print("Importing statuses...")
+    df = pd.read_csv('data/status.csv')
+    df = clean_data(df)
+    
+    try:
+        for _, row in df.iterrows():
+            existing = Status.query.filter_by(statusId=row['statusId']).first()
+            if not existing:
+                status = Status(
+                    statusId=row['statusId'],
+                    status=row['status'],
+                )
+                db.session.add(status)
+        
+        db.session.commit()
+        print(f" Successfully imported {len(df)} statuses")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing statuses: {e}")
         raise
 
 def import_constructors():
@@ -141,6 +167,39 @@ def import_races():
     except Exception as e:
         db.session.rollback()
         print(f" Error importing races: {e}")
+        raise
+
+def import_circuits():
+    if table_exists_and_has_data(Circuit):
+        print(" Circuits table already has data, skipping...")
+        return
+        
+    print("Importing circuits...")
+    df = pd.read_csv('data/circuits.csv')
+    df = clean_data(df)
+    
+    try:
+        for _, row in df.iterrows():
+            existing = Circuit.query.filter_by(circuitId=row['circuitId']).first()
+            if not existing:
+                circuits = Circuit(
+                    circuitId=row['circuitId'],
+                    circuitRef=row['circuitRef'],
+                    name=row['name'],
+                    location=row['location'],
+                    country=row['country'],
+                    lat=row['lat'],
+                    lng=row['lng'],
+                    alt=row['alt'],
+                    url=row['url'],
+                )
+                db.session.add(circuits)
+        
+        db.session.commit()
+        print(f" Successfully imported {len(df)} circuits")
+    except Exception as e:
+        db.session.rollback()
+        print(f" Error importing constructors: {e}")
         raise
 
 def import_results():
@@ -326,6 +385,8 @@ def main():
             import_results()
             import_driver_standings()
             import_constructor_standings()
+            import_circuits()
+            import_statuses()
             
             print("\n" + "=" * 40)
             print("Data import completed successfully!")
@@ -336,6 +397,8 @@ def main():
             print(f"   - Results: {Result.query.count()}")
             print(f"   - Driver Standings: {DriverStanding.query.count()}")
             print(f"   - Constructor Standings: {ConstructorStanding.query.count()}")
+            print(f"   - Circuits: {Circuit.query.count()}")
+            print(f"   - Statuses: {Status.query.count()}")
             
         except Exception as e:
             print(f"\n Import failed: {e}")

@@ -6,7 +6,7 @@ class Race(db.Model):
     raceId = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer)
     round = db.Column(db.Integer)
-    circuitId = db.Column(db.Integer)
+    circuitId = db.Column(db.Integer, db.ForeignKey('circuits.circuitId'))
     name = db.Column(db.String(255))
     date = db.Column(db.Date)
     time = db.Column(db.Time)

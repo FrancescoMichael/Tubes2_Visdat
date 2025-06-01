@@ -5,6 +5,8 @@ from .race import Race
 from .result import Result
 from .driver_standing import DriverStanding
 from .constructor_standing import ConstructorStanding
+from .circuit import Circuit
+from .status import Status
 
 __all__ = [
     'db',
@@ -14,4 +16,6 @@ __all__ = [
     'Result',
     'DriverStanding',
     'ConstructorStanding',
+    'Circuit',
+    'Status'
 ]
