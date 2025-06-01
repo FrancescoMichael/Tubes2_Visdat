@@ -287,8 +287,12 @@ function App() {
               <img src={bannerRed} alt="Line Chart Icon" className="w-full" />
             </div>
           </div>
-          <div className="w-full mt-4 h-1 -z-10">
-            <img src={pattern} alt="Line Chart Icon" className="w-full" />
+          <div className="w-full mt-4 h-2 -z-10">
+              <img 
+                src={pattern} 
+                alt="Line Chart Icon" 
+                className="w-full h-24 object-cover object-center" 
+              />
           </div>
           <div className='OVERVIEWNUMBER -mt-8 grid gap-4 grid-cols-4 z-10 p-2'>
             <div>
