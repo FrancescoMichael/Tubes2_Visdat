@@ -46,49 +46,33 @@ export default function View2({year}: View2Props) {
                 <div className="">
                     <p style={{ fontFamily: "Formula1" }} className="text-xl mb-2 pt-2 pl-2">CIRCUIT NAME</p>   
                 </div>
-                <div className="border-t-8 border-r-8 border-red-500 rounded-tr-4xl p-4">
-                    <div className="CIRCUITBANNER w-full h-96 rounded-tr-4xl">
-                        <img src={circuit} alt="Line Chart Icon" className="w-full h-96 object-cover object-center" />
+                <div className="border-t-10 border-r-10 border-red-500 rounded-tr-4xl pt-6 pr-6 flex items-center justify-between bg-white gap-2 ">
+                    <div className="CIRCUITBANNER w-2/3 h-72">
+                        <img src={circuit } alt="Line Chart Icon" className="w-full h-72 object-cover object-center" />
                     </div>
-                    <div className="w-full mt-4 h-2 -z-10">
-                        <img 
-                            src={pattern} 
-                            alt="Line Chart Icon" 
-                            className="w-full h-24 object-cover object-center" 
-                        />
-                    </div>
-                    <div className='OVERVIEWNUMBER -mt-8 grid gap-4 grid-cols-3 z-10 p-2'>
-                        <div className="bg-white rounded-bl-2xl rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <div className='OVERVIEWNUMBER w-1/3 grid gap-8 grid-rows-2 h-72'>
+                        <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
                             <div className="">
-                                <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
-                                    Melbourne
-                                </div>
                                 <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
                                     Location
+                                </div>
+                                <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
+                                    Melbourne, Australia
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-bl-2xl rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
                             <div className="">
-                                <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
-                                    58
-                                </div>
                                 <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
                                     Lap Count
+                                </div>
+                                <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
+                                    58
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="bg-white rounded-bl-2xl rounded-br-2xl p-4 flex flex-col justify-center items-center text-center">
-                            <div className="">
-                                <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
-                                    Etc
-                                </div>
-                                <div className="bg-white text-sm text-gray-500 mt-1" style={{ fontFamily: "Formula1" }}>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 
