@@ -63,8 +63,8 @@ function App() {
   const [selectedView, setSelectedView] = useState('Drivers')
   const [selectedYear, setSelectedYear] = useState('2024')
   const [urlStandings, setUrlStandings] = useState(`${API_DRIVER_STANDINGS}/2024`)
-  const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/2024`)
-  const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/2024`)
+  const [urlPoles, setUrlPoles] = useState(`${API_STATS_POLES}/driver/2024`)
+  const [urlWins, setUrlWins] = useState(`${API_STATS_WINS}/driver/2024`)
   const [currentPage, setCurrentPage] = useState(1)
   const [urlJourneys, setUrlJourneys] = useState(`${API_DRIVER_JOURNEYS}/2024`)
 
@@ -85,7 +85,7 @@ function App() {
     }
 
     return {
-      labels: polesData.stats.map(item => item.driver_name),
+      labels: polesData.stats.map(item => item.name),
       datasets: [{
         data: polesData.stats.map(item => item.poles),
         backgroundColor: polesData.stats.map(item => item.color),
@@ -107,7 +107,7 @@ function App() {
     console.log(winsData)
 
     return {
-      labels: winsData.stats.map(item => item.driver_name),
+      labels: winsData.stats.map(item => item.name),
       datasets: [{
         data: winsData.stats.map(item => item.wins),
         backgroundColor: winsData.stats.map(item => item.color),
@@ -149,7 +149,6 @@ function App() {
     }
     
     if (selectedView === 'Drivers') {
-      // Type guard for DriverJourneysResponse
       if ('drivers' in journeys && Array.isArray(journeys.drivers)) {
         const data = journeys.drivers.map(journey => ({
             label: journey.driver_name,
@@ -205,8 +204,8 @@ function App() {
       setUrlStandings(`http://localhost:5000/api/standings/${standingsEndpoint}/${selectedYear}`)
       
       // Update stats URLs
-      setUrlPoles(`http://localhost:5000/api/stats/poles/${selectedYear}`)
-      setUrlWins(`http://localhost:5000/api/stats/wins/${selectedYear}`)
+      setUrlPoles(`http://localhost:5000/api/stats/poles/${standingsEndpoint}/${selectedYear}`)
+      setUrlWins(`http://localhost:5000/api/stats/wins/${standingsEndpoint}/${selectedYear}`)
       
       // Update journeys URL
       const journeysEndpoint = selectedView === 'Drivers' ? 'drivers' : 'constructors'
@@ -296,12 +295,12 @@ function App() {
 
           <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4 h-fit'>
             <DonutChartCard
-              title="Pole(s) by Driver"
+              title={`Pole(s) by ${selectedView === 'Drivers' ? 'Driver' : 'Team'}`}
               chartData={getPolesChartData()}
               chartOptions={chartOptions1}
             />
             <DonutChartCard
-              title="Win(s) by Driver"
+              title={`Win(s) by ${selectedView === 'Drivers' ? 'Driver' : 'Team'}`}
               chartData={getWinsChartData()}
               chartOptions={chartOptions2}
             />

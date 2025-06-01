@@ -2,7 +2,7 @@ from flask import jsonify
 from models import db, Race, Result, Driver, Constructor
 from sqlalchemy import and_
 
-def get_stats_wins(year):
+def get_driver_stats_win(year):
     try:
         races = Race.query.filter_by(year=year).order_by(Race.round).all()
         
@@ -35,7 +35,7 @@ def get_stats_wins(year):
                 win_counts[driver_id] = {
                     # 'driver_id': driver_id,
                     # 'code': driver.code,
-                    'driver_name': f"{driver.forename} {driver.surname}",
+                    'name': f"{driver.forename} {driver.surname}",
                     'color': constructor.color,
                     # 'nationality': driver.nationality,
                     # 'team_name': constructor.name,
@@ -66,8 +66,54 @@ def get_stats_wins(year):
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+def get_team_stats_wins(year):
+    try:
+        races = Race.query.filter_by(year=year).order_by(Race.round).all()
 
-def get_stats_poles(year):
+        if not races:
+            return jsonify({'error': f'No races found for year {year}'}), 404
+
+        winners = (
+            db.session.query(
+                Result,
+                Constructor
+            )
+            .join(Race, Result.raceId == Race.raceId)
+            .join(Constructor, Result.constructorId == Constructor.constructorId)
+            .filter(
+                and_(
+                    Race.year == year,
+                    Result.position == 1
+                )
+            )
+            .order_by(Race.round)
+            .all()
+        )
+
+        win_counts = {}
+        for result, constructor in winners:
+            team_id = constructor.constructorId
+            if team_id not in win_counts:
+                win_counts[team_id] = {
+                    'name': constructor.name,
+                    'color': constructor.color,
+                    'wins': 0
+                }
+            win_counts[team_id]['wins'] += 1
+
+        win_stats = sorted(win_counts.values(), key=lambda x: x['wins'], reverse=True)
+
+        response = {
+            'stats': win_stats
+        }
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def get_driver_stats_pole(year):
     try:
         races = Race.query.filter_by(year=year).order_by(Race.round).all()
         
@@ -100,7 +146,7 @@ def get_stats_poles(year):
                 pole_counts[driver_id] = {
                     # 'driver_id': driver_id,
                     # 'code': driver.code,
-                    'driver_name': f"{driver.forename} {driver.surname}",
+                    'name': f"{driver.forename} {driver.surname}",
                     'color': constructor.color,
                     # 'nationality': driver.nationality,
                     # 'team_name': constructor.name,
@@ -137,5 +183,51 @@ def get_stats_poles(year):
         
         return jsonify(response)
     
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def get_team_stats_poles(year):
+    try:
+        races = Race.query.filter_by(year=year).order_by(Race.round).all()
+
+        if not races:
+            return jsonify({'error': f'No races found for year {year}'}), 404
+
+        pole_sitters = (
+            db.session.query(
+                Result,
+                Constructor
+            )
+            .join(Race, Result.raceId == Race.raceId)
+            .join(Constructor, Result.constructorId == Constructor.constructorId)
+            .filter(
+                and_(
+                    Race.year == year,
+                    Result.grid == 1
+                )
+            )
+            .order_by(Race.round)
+            .all()
+        )
+
+        pole_counts = {}
+        for result, constructor in pole_sitters:
+            team_id = constructor.constructorId
+            if team_id not in pole_counts:
+                pole_counts[team_id] = {
+                    'team_name': constructor.name,
+                    'color': constructor.color,
+                    'poles': 0
+                }
+            pole_counts[team_id]['poles'] += 1
+
+        pole_stats = sorted(pole_counts.values(), key=lambda x: x['poles'], reverse=True)
+
+        response = {
+            'stats': pole_stats
+        }
+        return jsonify(response)
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500

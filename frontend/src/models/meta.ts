@@ -5,7 +5,7 @@ export interface YearsResponse {
 export interface PolesResponse {
   stats: {
     color: string,
-    driver_name: string,
+    name: string,
     poles: number,
   }[]
 }
@@ -13,7 +13,7 @@ export interface PolesResponse {
 export interface WinsResponse {
   stats: {
     color: string,
-    driver_name: string,
+    name: string,
     wins: number,
   }[]
 }
