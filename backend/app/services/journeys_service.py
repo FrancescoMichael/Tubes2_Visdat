@@ -38,6 +38,7 @@ def get_top3_points_journey(year):
                 top3_drivers.append({
                     'driver_id': driver.driverId,
                     'code': driver.code,
+                    'color' : constructor.color,
                     'driver_name': f"{driver.forename} {driver.surname}",
                     'nationality': driver.nationality,
                     'team_name': constructor.name,
@@ -75,6 +76,7 @@ def get_top3_points_journey(year):
                 top3_drivers.append({
                     'driver_id': driver.driverId,
                     'code': driver.code,
+                    'color': None, 
                     'driver_name': f"{driver.forename} {driver.surname}",
                     'nationality': driver.nationality,
                     'team_name': team_name,
@@ -131,6 +133,7 @@ def get_top3_points_journey(year):
             response_data['drivers'].append({
                 'rank': driver['final_rank'],
                 'code': driver['code'],
+                'color': driver['color'],
                 'driver_name': driver['driver_name'],
                 'nationality': driver['nationality'],
                 'team_name': driver['team_name'],
@@ -179,6 +182,7 @@ def get_constructor_journeys(year):
             constructors_data.append({
                 'constructor_id': constructor.constructorId,
                 'name': constructor.name,
+                'color': constructor.color,
                 'nationality': constructor.nationality,
                 'final_rank': cs.position,
                 'final_points': float(cs.points) if cs.points else 0,
@@ -232,6 +236,7 @@ def get_constructor_journeys(year):
             constructor_id = constructor['constructor_id']
             response_data['constructors'].append({
                 'rank': constructor['final_rank'],
+                'color': constructor['color'],
                 'name': constructor['name'],
                 'nationality': constructor['nationality'],
                 'final_points': constructor['final_points'],

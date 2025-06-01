@@ -1,5 +1,6 @@
 export interface DriverJourney {
   code: string;
+  color: string;
   driver_name: string;
   final_points: number;
   final_wins: number;
@@ -28,6 +29,7 @@ export interface DriverJourneysResponse {
 
 export interface ConstructorJourney {
   final_points: number;
+  color: string;
   final_wins: number;
   name: string;
   nationality: string;

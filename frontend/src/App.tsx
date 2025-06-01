@@ -117,7 +117,6 @@ function App() {
 
   const {
     data: journeys,
-    loading: loading2,
     error: error2
   } = useFetch<DriverJourneysResponse | ConstructorJourneyResponse>(urlJourneys);
 
@@ -155,7 +154,7 @@ function App() {
         const data = journeys.drivers.map(journey => ({
             label: journey.driver_name,
             data: journey.points_journey.map(point => point.cumulative_points),
-            borderColor: '#1E41FF',
+            borderColor: journey.color,
             backgroundColor: 'rgba(30, 65, 255, 0.1)',
             tension: 0.4,
             fill: false
@@ -177,7 +176,7 @@ function App() {
         const data = journeys.constructors.map(journey => ({
           label: journey.name,
           data: journey.points_journey.map(point => point.cumulative_points),
-          borderColor: '#1E41FF',
+          borderColor: journey.color,
           backgroundColor: 'rgba(30, 65, 255, 0.1)',
           tension: 0.4,
           fill: false
