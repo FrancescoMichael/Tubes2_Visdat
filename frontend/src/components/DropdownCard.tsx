@@ -31,7 +31,7 @@ const DropdownCard: React.FC<DropdownCardProps> = ({
   const maxHeight = Math.min(options.length, 10) * 30 + 25;
 
   return (
-    <div className="text-white p-4 w-full relative">
+    <div className="text-white p-4 w-full relative pt-2">
       <div className="mb-2">
         <label 
           htmlFor={`${title}-dropdown`} 

@@ -248,7 +248,7 @@ function App() {
             />
           </div>
       </div>
-      <div className="WRAPPER grid grid-cols-2 gap-4 w-full p-6">
+      <div className="WRAPPER grid grid-cols-2 gap-8 w-full p-6 pt-2">
         <div className='LEFTHALF'>
           <div className='flex flex-row gap-2 justify-center items-center '>
             <div className="w-1/4 mt-2">
@@ -270,7 +270,7 @@ function App() {
             </div>
           </div>
 
-          <div className='LINECHART mt-4 grid grid-cols-1'>
+          <div className='LINECHART mt-2 grid grid-cols-1'>
             <LineChartCard
               title="Championship"
               chartData={getLineChartData(selectedView)}
@@ -295,7 +295,7 @@ function App() {
             onPageChange={setCurrentPage}
           />
 
-          <div className='DONUTCHART mt-4 grid grid-cols-2 gap-4 h-fit'>
+          <div className='DONUTCHART mt-2 grid grid-cols-2 gap-4 h-fit'>
             <DonutChartCard
               title={`Pole(s) by ${selectedView === 'Drivers' ? 'Driver' : 'Team'}`}
               chartData={getPolesChartData()}
