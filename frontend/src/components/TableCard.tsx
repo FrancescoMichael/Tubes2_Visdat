@@ -47,7 +47,7 @@ const TableCard: React.FC<TableCardProps> = ({
       </div>
 
       <div className="relative overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 font-semibold mb-4 pt-2 pl-2">
+        <table className="min-w-full lg:min-h-60 divide-y divide-gray-200 font-semibold mb-4 pt-2">
           <thead className="bg-gray-50">
             <tr>
               {columns.map((col, index) => (
@@ -67,24 +67,42 @@ const TableCard: React.FC<TableCardProps> = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
-            {paginatedData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover:bg-gray-50">
-                {row.map((cell, colIndex) => (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-sm text-gray-600"
-                    style={{
-                      fontFamily: columnFonts?.[colIndex],
-                      fontSize: columnSizes?.[colIndex]
-                        ? `${columnSizes[colIndex]}px`
-                        : 'inherit',
-                    }}
-                  >
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {paginatedData.map((row, rowIndex) => {
+              const globalIndex = (currentPage - 1) * itemsPerPage + rowIndex;
+              
+              let bgColor = "hover:bg-gray-50";
+              if (globalIndex === 0) {
+                bgColor = "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600";
+              } else if (globalIndex === 1) {
+                bgColor = "bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500"; 
+              } else if (globalIndex === 2) {
+                bgColor = "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"; 
+              }
+
+              let textColor = "text-gray-600"; 
+              if (globalIndex <= 2) {
+                textColor = "text-white font-semibold";
+              }
+
+              return (
+                <tr key={rowIndex} className={bgColor}>
+                  {row.map((cell, colIndex) => (
+                    <td
+                      key={colIndex}
+                      className={`px-4 py-2 text-sm ${textColor}`}
+                      style={{
+                        fontFamily: columnFonts?.[colIndex],
+                        fontSize: columnSizes?.[colIndex]
+                          ? `${columnSizes[colIndex]}px`
+                          : 'inherit',
+                      }}
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
