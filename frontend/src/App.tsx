@@ -6,6 +6,7 @@ import LineChartCard from './components/LineChartCard'
 import TableCard from './components/TableCard'
 import StatCard from './components/StatCard'
 import "./assets/fonts/Formula1-Regular_web_0.ttf";
+import pattern from "./assets/pattern.png";
 import bannerRed from "./assets/banner-red.png";
 import { useState, useEffect } from 'react'
 import useFetch from './hooks/useFetch'
@@ -286,7 +287,10 @@ function App() {
               <img src={bannerRed} alt="Line Chart Icon" className="w-full" />
             </div>
           </div>
-          <div className='OVERVIEWNUMBER grid gap-4 grid-cols-4'>
+          <div className="w-full mt-4 h-1 -z-10">
+            <img src={pattern} alt="Line Chart Icon" className="w-full" />
+          </div>
+          <div className='OVERVIEWNUMBER -mt-8 grid gap-4 grid-cols-4 z-10 p-2'>
             <div>
               <StatCard value={selectedView === 'Drivers' ? getSummaryDriver().total_drivers.toString() : getSummaryTeam().total_teams.toString()} label={`Total ${selectedView === 'Drivers' ? 'Drivers' : 'Teams'}`} />
             </div>
