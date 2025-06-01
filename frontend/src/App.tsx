@@ -48,6 +48,19 @@ const lineChartOptions: ChartOptions<'line'> = {
   plugins: {
     legend: {
       position: 'top'
+    },
+    tooltip: {
+      callbacks: {
+        afterLabel: function(context) {
+          const dataset = context.dataset as any;
+          const dataIndex = context.dataIndex;
+          
+          if (dataset.positions && dataset.positions[dataIndex]) {
+            return `Position: ${dataset.positions[dataIndex]}`;
+          }
+          return '';
+        }
+      }
     }
   },
   scales: {
@@ -191,8 +204,9 @@ function App() {
             data: journey.points_journey.map(point => point.cumulative_points),
             borderColor: journey.color,
             backgroundColor: 'rgba(30, 65, 255, 0.1)',
-            tension: 0.4,
-            fill: false
+            tension: 0.1,
+            fill: false,
+            positions: journey.points_journey.map(point => point.position)
           }))
 
         return {
@@ -213,7 +227,8 @@ function App() {
           borderColor: journey.color,
           backgroundColor: 'rgba(30, 65, 255, 0.1)',
           tension: 0.4,
-          fill: false
+          fill: false,
+          positions: journey.points_journey.map(point => point.position)
         }))
 
         return {
