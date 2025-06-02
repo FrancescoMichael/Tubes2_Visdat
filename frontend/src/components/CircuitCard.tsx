@@ -5,6 +5,7 @@ interface CircuitCardProps {
     location_city: string;
     numberOfLaps: number;
     imageUrl: string;
+    length: string;
     // New pagination props
     currentPage: number;
     totalPages: number;
@@ -18,6 +19,7 @@ export default function CircuitCard({
     location_city, 
     numberOfLaps, 
     imageUrl,
+    length,
     currentPage,
     totalPages,
     onPageChange
@@ -51,9 +53,15 @@ export default function CircuitCard({
             
             <div className="border-t-10 border-r-10 border-red-500 rounded-tr-4xl mt-8 pt-6 pr-6 flex items-center justify-between bg-white gap-2">
                 <div className="CIRCUITBANNER w-2/3 h-72">
-                    <img src={imageUrl} alt="Circuit Image" className="w-full h-72 object-cover object-center" />
+                    {imageUrl != "null" ? (
+                        <img src={imageUrl} alt="Circuit Image" className="w-full h-72 object-contain object-center" />
+                    ) : (
+                        <div className="w-full h-72 flex items-center justify-center bg-gray-200 text-gray-500">
+                            No image available
+                        </div>
+                    )}
                 </div>
-                <div className='OVERVIEWNUMBER w-1/3 grid gap-8 grid-rows-2 h-72'>
+                <div className='OVERVIEWNUMBER w-1/3 grid gap-8 grid-rows-3 h-72'>
                     <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col">
                         <div className="">
                             <div className="bg-white text-sm text-gray-500" style={{ fontFamily: "Formula1" }}>
@@ -71,6 +79,16 @@ export default function CircuitCard({
                             </div>
                             <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
                                 {numberOfLaps}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white border-r border-b border-gray-500 rounded-br-2xl p-4 flex flex-col">
+                        <div className="">
+                            <div className="bg-white text-sm text-gray-500" style={{ fontFamily: "Formula1" }}>
+                                Circuit Length
+                            </div>
+                            <div className="bg-white text-2xl font-bold" style={{ fontFamily: "Formula1" }}>
+                                {length}
                             </div>
                         </div>
                     </div>

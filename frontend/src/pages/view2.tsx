@@ -1,7 +1,4 @@
 import { useCallback } from "react";
-// import pattern from "../assets/pattern.png";
-// import bannerRed from "../assets/banner-red.png";
-// import circuit from "../assets/circuit.png";
 import bannerBlack from "../assets/banner-black.png";
 import "../assets/fonts/Formula1-Regular_web_0.ttf";
 import type { View2Props } from "../models/props";
@@ -14,7 +11,6 @@ import type { F1Season, RaceData, RaceResult } from "../models/circuit";
 
 export default function View2({year}: View2Props) {
 
-    const tableTitle = 'Race Results';
     const tableColumns = ['Position', 'Driver', 'Points']
 
     const [urlCircuit, setUrlCircuit] = useState(`${API_CIRCUITS}/${year}`)
@@ -77,7 +73,8 @@ export default function View2({year}: View2Props) {
                         location_country={currentCircuit?.country ?? 'Country'}
                         location_city={currentCircuit?.location ?? 'City'}
                         numberOfLaps={currentCircuit?.races[0]?.total_laps ?? 0}
-                        imageUrl={currentCircuit?.url ?? 'https://via.placeholder.com/400x300?text=Circuit+Image'}
+                        imageUrl={circuitResultData?.circuit.image_url ?? 'null'}
+                        length={circuitResultData?.circuit.last_length_used ?? '0 km'}
                         currentPage={currentCircuitPage}
                         totalPages={totalCircuits}
                         onPageChange={setCurrentCircuitPage}
@@ -114,7 +111,7 @@ export default function View2({year}: View2Props) {
                                         <div style={{ fontFamily: "Formula1Bold" }} className="font-bold text-lg mb-1">
                                             {typeof getTableData()[1]?.[1] === 'string'
                                                 ? (getTableData()[1][1] as string).split(' ').slice(-1)[0]?.toUpperCase()
-                                                : 'WWOI'}
+                                                : ''}
                                         </div>
                                         <div style={{ fontFamily: "Formula1Bold" }} className="bg-white text-black px-2 py-1 rounded text-sm font-bold">
                                             {getTableData()[1]?.[2] ?? '0'} PTS
@@ -140,7 +137,7 @@ export default function View2({year}: View2Props) {
                                         <div style={{ fontFamily: "Formula1Bold" }} className="font-bold text-lg mb-1">
                                             {typeof getTableData()[0]?.[1] === 'string'
                                                 ? (getTableData()[0][1] as string).split(' ').slice(-1)[0]?.toUpperCase()
-                                                : 'WWOI'}
+                                                : ''}
                                         </div>
                                         <div style={{ fontFamily: "Formula1Bold" }} className="bg-white text-black px-2 py-1 rounded text-sm font-bold">
                                             {getTableData()[0]?.[2] ?? '0'} PTS
