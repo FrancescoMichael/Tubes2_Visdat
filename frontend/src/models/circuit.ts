@@ -44,7 +44,10 @@ export interface Circuit {
   coordinates: Coordinates;
   country: string;
   location: string;
+  image_url: string;
+  last_length_used: string;
   name: string;
+  turns: string;
   url: string;
 }
 
