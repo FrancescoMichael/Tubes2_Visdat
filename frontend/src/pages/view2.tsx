@@ -2,9 +2,10 @@ import { useCallback } from "react";
 // import pattern from "../assets/pattern.png";
 // import bannerRed from "../assets/banner-red.png";
 // import circuit from "../assets/circuit.png";
+import bannerBlack from "../assets/banner-black.png";
 import "../assets/fonts/Formula1-Regular_web_0.ttf";
 import type { View2Props } from "../models/props";
-import TableCard from "../components/TableCard";
+import TableRace from "../components/TableRace";
 import CircuitCard from "../components/CircuitCard";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
@@ -83,19 +84,15 @@ export default function View2({year}: View2Props) {
                     />
                 </div>
                 <div className='RIGHTHALF grid grid-cols-1'>
-                    <div className="relative bg-black p-6 rounded-lg mb-8">
+                    <div className="relative rounded-lg mb-2">
                         {/* F1 Header */}
-                        <div className="flex items-center justify-center mb-6">
-                            <div className="bg-red-600 h-2 w-full"></div>
-                            <img 
-                                src="https://logos-world.net/wp-content/uploads/2023/12/F1-Logo-500x281.png" 
-                                alt="F1 Logo" 
-                                className="h-32 object-cover rounded"
-                            />
-                            <div className="bg-red-600 h-2 w-full"></div>
-                        </div>
-                        <div style={{ fontFamily: "Formula1Bold" }} className="text-center text-white text-3xl font-bold mb-8 tracking-wider">
-                            {currentCircuit?.location?.toUpperCase() ?? 'MONACO'}
+                        <div className='flex flex-row gap-2 justify-center items-center '>
+                            <div className="w-1/4 mt-2">
+                                <p style={{ fontFamily: "Formula1Bold" }} className="text-2xl font-bold mb-4 pt-2 pl-2">Race Result</p>
+                            </div>
+                            <div className="w-3/4">
+                                <img src={bannerBlack} alt="Line Chart Icon" className="w-full" />
+                            </div>
                         </div>
                         
                         {/* Podium */}
@@ -180,10 +177,9 @@ export default function View2({year}: View2Props) {
                         </div>
                     </div>
 
-                    <TableCard
-                        title={tableTitle}
+                    <TableRace
                         columns={tableColumns}
-                        data={getTableData().slice(3, 10)}  // Only 4th to 10th
+                        data={getTableData().slice(3, 10)}
                         headingFontFamily='Formula1Bold'
                         columnFonts={['Formula1', 'Formula1', 'Formula1']}
                         columnSizes={[14, 16, 14]}
