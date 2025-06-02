@@ -175,7 +175,7 @@ def import_circuits():
         return
         
     print("Importing circuits...")
-    df = pd.read_csv('data/circuits.csv')
+    df = pd.read_csv('data/merged_circuits.csv')
     df = clean_data(df)
     
     try:
@@ -192,6 +192,9 @@ def import_circuits():
                     lng=row['lng'],
                     alt=row['alt'],
                     url=row['url'],
+                    last_length_used = row['last_length_used'],
+                    turns = row['turns'],
+                    image_url = row['image_url']
                 )
                 db.session.add(circuits)
         

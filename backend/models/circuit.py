@@ -12,6 +12,9 @@ class Circuit(db.Model):
     lng = db.Column(db.Float)
     alt = db.Column(db.Integer)
     url = db.Column(db.String(255))
+    last_length_used = db.Column(db.String(255))
+    turns = db.Column(db.String(255))
+    image_url = db.Column(db.String(255))
 
     races = db.relationship('Race', backref='circuit', lazy=True)
 

@@ -1,5 +1,5 @@
 from flask import jsonify
-from models import db, Race, Circuit, Result, Driver, Constructor, DriverStanding, ConstructorStanding, Status
+from models import db, Race, Circuit, Result, Driver, Constructor, Status
 from sqlalchemy import and_, func
 
 def get_circuits_with_results(year, circuit_id=0):
@@ -36,7 +36,10 @@ def get_circuits_with_results(year, circuit_id=0):
                     'longitude': float(circuit.lng) if circuit.lng else None,
                     'altitude': circuit.alt
                 },
-                'url': circuit.url
+                'url': circuit.url,
+                'last_length_used': circuit.last_length_used,
+                'turns': circuit.turns,
+                'image_url': circuit.image_url,
             },
             'total_laps': total_laps,
             'race_time': race.time.strftime('%H:%M:%S') if race.time else None,

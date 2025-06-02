@@ -1,84 +1,73 @@
 import csv
-import os
 import requests
 from bs4 import BeautifulSoup
-from colorama import Fore, Style, init
 import tempfile
+import shutil
+import os
 
-# Initialize colorama
-init()
-
-# Create directory for images
-os.makedirs('img/circuits', exist_ok=True)
-
-# Temporary file to write updated CSV
-temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, newline='', encoding='utf-8')
-
-with open('./data/circuits.csv', 'r', encoding='utf-8') as csvfile, temp_file:
-    reader = csv.DictReader(csvfile)
-    
-    # Add new field to fieldnames
-    fieldnames = reader.fieldnames + ['image_path'] if 'image_path' not in reader.fieldnames else reader.fieldnames
-    writer = csv.DictWriter(temp_file, fieldnames=fieldnames)
-    writer.writeheader()
-
-    for row in reader:
-        image_path = None  # Default
+def get_wikimedia_image_url(map_link):
+    try:
+        # Fetch the Wikimedia file page
+        response = requests.get(map_link, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
         
-        if not row['url'] or row['url'] == '\\N':
-            print(f"{Fore.YELLOW}SKIPPED:{Style.RESET_ALL} {row.get('name', '')} - no URL")
-            writer.writerow(row)
-            continue
+        # Find the direct file link in the "fullImageLink" div
+        full_image_div = soup.find('div', class_='fullImageLink')
+        if full_image_div:
+            file_link = full_image_div.find('a')['href']
+            if file_link.startswith('//'):
+                return 'https:' + file_link
+            elif file_link.startswith('/'):
+                return 'https://commons.wikimedia.org' + file_link
+            return file_link
+        
+        # Fallback to the highest resolution thumbnail if direct link not found
+        for img in soup.find_all('img'):
+            src = img.get('src', '')
+            if src and 'wikipedia/commons/thumb/' in src:
+                if src.startswith('//'):
+                    src = 'https:' + src
+                return src
+                
+        return None
+    
+    except Exception as e:
+        print(f"Error fetching image from {map_link}: {str(e)}")
+        return None
 
-        try:
-            print(f"Processing {row['name']}...")
-            response = requests.get(row['url'], timeout=10)
-            response.raise_for_status()
+# Input and output file paths
+input_csv = './data/f1_circuits_beautifulsoup.csv'
+output_csv = './data/circuits_simplified.csv'
 
-            soup = BeautifulSoup(response.text, 'html.parser')
-            infobox_image = soup.find('td', class_='infobox-image')
-            img_tag = None
+# Create a temporary file for writing
+with tempfile.NamedTemporaryFile(mode='w', delete=False, newline='', encoding='utf-8') as temp_file:
+    with open(input_csv, 'r', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        
+        # Define the columns we want to keep
+        fieldnames = ['Circuit', 'Last length used', 'Turns', 'image_url']
+        
+        writer = csv.DictWriter(temp_file, fieldnames=fieldnames)
+        writer.writeheader()
 
-            # Method 1: Look inside span.mw-default-size > a.mw-file-description > img
-            span_default = infobox_image.find('span', class_='mw-default-size') if infobox_image else None
-            if span_default:
-                file_link = span_default.find('a', class_='mw-file-description')
-                if file_link:
-                    img_tag = file_link.find('img')
+        for row in reader:
+            # Get the image URL if Map_link exists
+            image_url = None
+            if row.get('Map_link') and row['Map_link'] != '\\N':
+                image_url = get_wikimedia_image_url(row['Map_link'])
+                print(f"Processed {row['Circuit']}: {image_url}")
+            
+            # Create a new row with only the desired columns
+            new_row = {
+                'Circuit': row['Circuit'],
+                'Last length used': row['Last length used'],
+                'Turns': row['Turns'],
+                'image_url': image_url
+            }
+            
+            writer.writerow(new_row)
 
-            # Method 2: Look for img directly inside infobox
-            if not img_tag and infobox_image:
-                img_tag = infobox_image.find('img')
-
-            if img_tag and 'src' in img_tag.attrs:
-                img_url = 'https:' + img_tag['src'] if img_tag['src'].startswith('//') else img_tag['src']
-
-                # Use highest resolution from srcset if available
-                if 'srcset' in img_tag.attrs:
-                    srcset = img_tag['srcset'].split(',')
-                    if srcset:
-                        highest_res = srcset[-1].strip().split(' ')[0]
-                        img_url = 'https:' + highest_res if highest_res.startswith('//') else highest_res
-
-                # Download image
-                img_data = requests.get(img_url, timeout=10).content
-                circuit_name = row['name'].strip().lower().replace(' ', '_').replace('/', '_')
-                filename = f'./img/circuits/{circuit_name}.jpg'
-                with open(filename, 'wb') as f:
-                    f.write(img_data)
-
-                image_path = filename
-                print(f"{Fore.GREEN}SUCCESS:{Style.RESET_ALL} {row['name']}")
-            else:
-                print(f"{Fore.RED}FAILED:{Style.RESET_ALL} No image found for {row['name']}")
-        except requests.exceptions.RequestException as e:
-            print(f"{Fore.RED}Network error for {row['name']}: {str(e)}{Style.RESET_ALL}")
-        except Exception as e:
-            print(f"{Fore.RED}Error processing {row['name']}: {str(e)}{Style.RESET_ALL}")
-
-        row['image_path'] = image_path
-        writer.writerow(row)
-
-# Replace original with updated CSV
-os.replace(temp_file.name, './data/circuits.csv')
-print(f"{Fore.GREEN}CSV file updated with image paths{Style.RESET_ALL}")
+# Replace the original file with the temporary file
+shutil.move(temp_file.name, output_csv)
+print(f"Processing complete. Simplified data saved to {output_csv}")
