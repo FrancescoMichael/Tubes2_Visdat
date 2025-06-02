@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import bannerBlack from "../assets/banner-black.png";
 import "../assets/fonts/Formula1-Regular_web_0.ttf";
 import type { View2Props } from "../models/props";
@@ -21,6 +21,9 @@ export default function View2({year}: View2Props) {
     const [currentPage, setCurrentPage] = useState(1)
     const [currentCircuitPage, setCurrentCircuitPage] = useState(1)
     
+    // State for handling image fallback
+    const [circuitImageSrc, setCircuitImageSrc] = useState('')
+    
     useEffect(() => {
         if (year) {
             setUrlCircuit(`${API_CIRCUITS}/${year}`)
@@ -29,6 +32,28 @@ export default function View2({year}: View2Props) {
         }
     }, [year])
 
+    const fileExtensions = useMemo(() => ['svg', 'png', 'jpeg', 'gif'], []);
+
+    const [imageErrorStage, setImageErrorStage] = useState(0) // 0=svg, 1=png, 2=jpeg, 3=gif
+
+    // Reset image state when circuit changes
+    useEffect(() => {
+        if (circuitResultData?.circuit.circuit_id) {
+            setImageErrorStage(0)
+            const ext = fileExtensions[0]
+            setCircuitImageSrc(`circuit_${circuitResultData.circuit.circuit_id}.${ext}`)
+        }
+    }, [circuitResultData?.circuit.circuit_id, fileExtensions])
+
+    // Handle image error - fallback to next extension
+    const handleCircuitImageError = () => {
+        if (circuitResultData?.circuit.circuit_id && imageErrorStage < fileExtensions.length - 1) {
+            const nextStage = imageErrorStage + 1
+            const ext = fileExtensions[nextStage]
+            setCircuitImageSrc(`circuit_${circuitResultData.circuit.circuit_id}.${ext}`)
+            setImageErrorStage(nextStage)
+        }
+    }
 
     // Memoize getCurrentCircuit to avoid unnecessary re-renders and fix dependency warning
     const getCurrentCircuit = useCallback(() => {
@@ -73,7 +98,9 @@ export default function View2({year}: View2Props) {
                         location_country={currentCircuit?.country ?? 'Country'}
                         location_city={currentCircuit?.location ?? 'City'}
                         numberOfLaps={currentCircuit?.races[0]?.total_laps ?? 0}
-                        imageUrl={circuitResultData?.circuit.image_url ?? 'null'}
+                        numberOfTurns={circuitResultData?.circuit.turns ?? '0'}
+                        imageUrl={circuitImageSrc}
+                        onImageError={handleCircuitImageError}
                         length={circuitResultData?.circuit.last_length_used ?? '0 km'}
                         currentPage={currentCircuitPage}
                         totalPages={totalCircuits}
@@ -188,4 +215,4 @@ export default function View2({year}: View2Props) {
             </div>
         </div>
     );
-}
+}   

@@ -230,13 +230,13 @@ export default function View1({ year, category }: View1Props) {
               <StatCard value={category === 'Drivers' ? getSummaryDriver().total_drivers.toString() : getSummaryTeam().total_teams.toString()} label={`Total ${category === 'Drivers' ? 'Drivers' : 'Teams'}`} />
             </div>
             <div>
-              <StatCard value={category === 'Drivers' ? getSummaryDriver().unique_driver_race_winners.toString() : getSummaryTeam().unique_team_race_winners.toString()} label={`Unique Winner`} />
+              <StatCard value={category === 'Drivers' ? getSummaryDriver().unique_driver_race_winners.toString() : getSummaryTeam().unique_team_race_winners.toString()} label={`Race Winners`} />
             </div>
             <div>
-              <StatCard value={category === 'Drivers' ? getSummaryDriver().unique_driver_podium_finishers.toString() :  getSummaryTeam().unique_team_podium_finishers.toString()} label={`Unique Podium`} />
+              <StatCard value={category === 'Drivers' ? getSummaryDriver().unique_driver_podium_finishers.toString() :  getSummaryTeam().unique_team_podium_finishers.toString()} label={`Podium Finishers`} />
             </div>
             <div>
-              <StatCard value={category === 'Drivers' ? getSummaryDriver().unique_driver_pole_sitters.toString() : getSummaryTeam().unique_team_pole_sitters.toString()} label={`Unique Pole`} />
+              <StatCard value={category === 'Drivers' ? getSummaryDriver().unique_driver_pole_sitters.toString() : getSummaryTeam().unique_team_pole_sitters.toString()} label={`Pole Sitters`} />
             </div>
           </div>
 

@@ -382,13 +382,13 @@ def main():
             db.create_all()
             print(" Database tables created")
             
+            import_circuits()
             import_drivers()
             import_constructors()
             import_races()
             import_results()
             import_driver_standings()
             import_constructor_standings()
-            import_circuits()
             import_statuses()
             
             print("\n" + "=" * 40)
