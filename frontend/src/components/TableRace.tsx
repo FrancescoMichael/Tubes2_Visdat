@@ -14,27 +14,18 @@ interface TableRaceProps {
 const TableRace: React.FC<TableRaceProps> = ({
   columns,
   data,
-  headingFontFamily,
   columnFonts,
   columnSizes,
   currentPage,
-  onPageChange,
   itemsPerPage,
 }) => {
   
   const effectiveItemsPerPage = itemsPerPage ?? 5;
-  const totalPages = Math.ceil(data.length / effectiveItemsPerPage);
 
   const paginatedData = data.slice(
     (currentPage - 1) * effectiveItemsPerPage,
     currentPage * effectiveItemsPerPage
   );
-
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page);
-    }
-  };
 
   return (
     <div className="relative w-full">

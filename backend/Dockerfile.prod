@@ -11,8 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Separate the data import from the run command
 RUN python import_data.py
 
 EXPOSE 5000
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "your_app_module:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
