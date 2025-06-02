@@ -26,6 +26,9 @@ export const API_DRIVER_STANDINGS = `${API_BASE_URL}/standings/drivers`;
 export const API_CONSTRUCTOR_STANDINGS = `${API_BASE_URL}/standings/constructors`;
 export const API_STANDINGS = `${API_BASE_URL}/standings`;
 
+export const API_CIRCUITS = `${API_BASE_URL}/circuits`;
+export const API_CIRCUITS_RESULT = `${API_BASE_URL}/circuits/results`;
+
 export const API_YEARS = `${API_BASE_URL}/years`;
 
 export const API_DRIVER_JOURNEYS = `${API_BASE_URL}/journeys/drivers`;
