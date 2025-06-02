@@ -23,6 +23,7 @@ export default function View2({year}: View2Props) {
     
     // State for handling image fallback
     const [circuitImageSrc, setCircuitImageSrc] = useState('')
+    const [imageErrorStage, setImageErrorStage] = useState(0) // 0=svg, 1=png, 2=jpeg, 3=gif
     
     useEffect(() => {
         if (year) {
@@ -34,8 +35,6 @@ export default function View2({year}: View2Props) {
 
     const fileExtensions = useMemo(() => ['svg', 'png', 'jpeg', 'gif'], []);
 
-    const [imageErrorStage, setImageErrorStage] = useState(0) // 0=svg, 1=png, 2=jpeg, 3=gif
-
     // Reset image state when circuit changes
     useEffect(() => {
         if (circuitResultData?.circuit.circuit_id) {
@@ -46,14 +45,14 @@ export default function View2({year}: View2Props) {
     }, [circuitResultData?.circuit.circuit_id, fileExtensions])
 
     // Handle image error - fallback to next extension
-    const handleCircuitImageError = () => {
+    const handleCircuitImageError = useCallback(() => {
         if (circuitResultData?.circuit.circuit_id && imageErrorStage < fileExtensions.length - 1) {
             const nextStage = imageErrorStage + 1
             const ext = fileExtensions[nextStage]
             setCircuitImageSrc(`circuit_${circuitResultData.circuit.circuit_id}.${ext}`)
             setImageErrorStage(nextStage)
         }
-    }
+    }, [circuitResultData?.circuit.circuit_id, imageErrorStage, fileExtensions]);
 
     // Memoize getCurrentCircuit to avoid unnecessary re-renders and fix dependency warning
     const getCurrentCircuit = useCallback(() => {
@@ -215,4 +214,4 @@ export default function View2({year}: View2Props) {
             </div>
         </div>
     );
-}   
+}
