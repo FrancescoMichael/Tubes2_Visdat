@@ -99,7 +99,7 @@ export default function View2({year}: View2Props) {
                         <div className="flex items-end justify-center gap-4">
                             {/* 2nd Place - Left */}
                             <div className="flex flex-col items-center">
-                                <div className="bg-red-600 rounded-t-lg p-6 pt-8 min-h-[300px] w-48 flex flex-col items-center justify-end relative">
+                                <div className="bg-gray-200 rounded-t-lg p-6 pt-8 min-h-[275px] w-48 flex flex-col items-center justify-end relative">
                                     <div className="absolute top-4 left-4">
                                         <div style={{ fontFamily: "Formula1Bold" }} className="bg-white text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">2</div>
                                     </div>
@@ -110,7 +110,7 @@ export default function View2({year}: View2Props) {
                                             className="w-24 h-32 object-cover rounded"
                                         />
                                     </div>
-                                   <div className="text-center text-white">
+                                   <div className="text-center text-black">
                                         <div style={{ fontFamily: "Formula1Bold" }} className="font-bold text-lg mb-1">
                                             {typeof getTableData()[1]?.[1] === 'string'
                                                 ? (getTableData()[1][1] as string).split(' ').slice(-1)[0]?.toUpperCase()
@@ -125,7 +125,7 @@ export default function View2({year}: View2Props) {
 
                             {/* 1st Place - Center */}
                             <div className="flex flex-col items-center">
-                                <div className="bg-orange-500 rounded-t-lg p-6 pt-8 min-h-[350px] w-48 flex flex-col items-center justify-end relative">
+                                <div className="bg-yellow-300  rounded-t-lg p-6 pt-8 min-h-[300px] w-48 flex flex-col items-center justify-end relative">
                                     <div className="absolute top-4 left-4">
                                         <div style={{ fontFamily: "Formula1Bold" }} className="bg-white text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">1</div>
                                     </div>
@@ -136,7 +136,7 @@ export default function View2({year}: View2Props) {
                                             className="w-24 h-32 object-cover rounded"
                                         />
                                     </div>
-                                    <div className="text-center text-white">
+                                    <div className="text-center text-black">
                                         <div style={{ fontFamily: "Formula1Bold" }} className="font-bold text-lg mb-1">
                                             {typeof getTableData()[0]?.[1] === 'string'
                                                 ? (getTableData()[0][1] as string).split(' ').slice(-1)[0]?.toUpperCase()
@@ -151,7 +151,7 @@ export default function View2({year}: View2Props) {
 
                             {/* 3rd Place - Right */}
                             <div className="flex flex-col items-center">
-                                <div className="bg-orange-600 rounded-t-lg p-6 pt-8 min-h-[280px] w-48 flex flex-col items-center justify-end relative">
+                                <div className="bg-amber-600 rounded-t-lg p-6 pt-8 min-h-[250px] w-48 flex flex-col items-center justify-end relative">
                                     <div className="absolute top-4 left-4">
                                         <div style={{ fontFamily: "Formula1Bold" }} className="bg-white text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">3</div>
                                     </div>
@@ -162,7 +162,7 @@ export default function View2({year}: View2Props) {
                                             className="w-24 h-32 object-cover rounded"
                                         />
                                     </div>
-                                    <div className="text-center text-white">
+                                    <div className="text-center text-black">
                                         <div style={{ fontFamily: "Formula1Bold" }} className="font-bold text-lg mb-1">
                                             {typeof getTableData()[2]?.[1] === 'string'
                                                 ? (getTableData()[2][1] as string).split(' ').slice(-1)[0]?.toUpperCase()

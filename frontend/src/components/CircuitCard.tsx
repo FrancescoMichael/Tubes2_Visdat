@@ -49,7 +49,7 @@ export default function CircuitCard({
                 </p>  
             </div>
             
-            <div className="border-t-10 border-r-10 border-red-500 rounded-tr-4xl pt-6 pr-6 flex items-center justify-between bg-white gap-2">
+            <div className="border-t-10 border-r-10 border-red-500 rounded-tr-4xl mt-8 pt-6 pr-6 flex items-center justify-between bg-white gap-2">
                 <div className="CIRCUITBANNER w-2/3 h-72">
                     <img src={imageUrl} alt="Circuit Image" className="w-full h-72 object-cover object-center" />
                 </div>
@@ -78,7 +78,7 @@ export default function CircuitCard({
             </div>
             
             {/* Pagination controls below the circuit */}
-            <div className="flex items-center justify-center gap-2 mt-4 p-2">
+            <div className="flex items-center justify-center gap-2 mt-24 p-2">
                 <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}

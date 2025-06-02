@@ -68,7 +68,7 @@ const TableRace: React.FC<TableRaceProps> = ({
                   {row.map((cell, colIndex) => (
                     <td
                       key={colIndex}
-                      className={`px-4 py-2 text-sm ${textColor}`}
+                      className={`px-2 py-1 text-xs ${textColor}`}
                       style={{
                         fontFamily: columnFonts?.[colIndex],
                         fontSize: columnSizes?.[colIndex]
