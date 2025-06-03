@@ -11,7 +11,7 @@ import useFetch from '../hooks/useFetch'
 import type { DriverSummary, PolesResponse, SummaryResponse, TeamSummary, WinsResponse } from '../models/meta'
 import type { ConstructorStanding, DriverStanding } from '../models/standing'
 import type { DriverJourneysResponse, ConstructorJourneyResponse } from '../models/journey'
-import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STATS_POLES, API_STATS_SUMMARY, API_STATS_WINS } from '../constant'
+import { API_DRIVER_JOURNEYS, API_DRIVER_STANDINGS, API_STANDINGS, API_STATS_POLES, API_STATS_SUMMARY, API_STATS_WINS } from '../constant'
 import { doughnutoption } from '../options/doughnutoption'
 import { lineChartOptions } from '../options/linechartoption'
 import type { View1Props } from '../models/props'
@@ -189,14 +189,14 @@ export default function View1({ year, category }: View1Props) {
   useEffect(() => {
     if (year) {
       const standingsEndpoint = category === 'Drivers' ? 'drivers' : 'constructors'
-      setUrlStandings(`http://localhost:5000/api/standings/${standingsEndpoint}/${year}`)
-      
-      setUrlPoles(`http://localhost:5000/api/stats/poles/${standingsEndpoint}/${year}`)
-      setUrlWins(`http://localhost:5000/api/stats/wins/${standingsEndpoint}/${year}`)
-      setUrlSummary(`http://localhost:5000/api/stats/summary/${year}`)
+      setUrlStandings(`${API_STANDINGS}/${standingsEndpoint}/${year}`)
+
+      setUrlPoles(`${API_STATS_POLES}/${standingsEndpoint}/${year}`)
+      setUrlWins(`${API_STATS_WINS}/${standingsEndpoint}/${year}`)
+      setUrlSummary(`${API_STATS_SUMMARY}/${year}`)
 
       const journeysEndpoint = category === 'Drivers' ? 'drivers' : 'constructors'
-      setUrlJourneys(`http://localhost:5000/api/journeys/${journeysEndpoint}/${year}`)
+      setUrlJourneys(`${API_DRIVER_JOURNEYS}/${journeysEndpoint}/${year}`)
 
       setCurrentPage(1)
     }
