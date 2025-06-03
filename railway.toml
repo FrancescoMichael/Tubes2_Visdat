@@ -1,5 +1,44 @@
-[build]
-buildCommand = "cd frontend && npm install && npm run build && cd ../backend && python3 -m pip install -r requirements.txt"
+# This single file will configure both your build environment and commands for Railway
 
-[deploy]
-startCommand = "cd backend && python3 import_data.py && python3 run.py"
+# Define the language providers
+providers = ["node", "python"]
+
+# Specify the exact versions for Node.js and Python
+[variables]
+NODE_VERSION = "18"
+PYTHON_VERSION = "3.11"
+
+# Explicitly include necessary Nixpkgs packages for Node.js, Python, and build tools
+[nixpkgs]
+packages = [
+    "nodejs_18",
+    "python311",
+    "python311Packages.pip",         # Include pip for python3.11
+    "python311Packages.setuptools",  # Include setuptools, often a pip dependency
+    "curl",                          # Needed to download get-pip.py
+    "build-tools"                    # Provides common build tools (like gcc) for Python packages
+]
+
+# Define the build phase commands
+[phases.build]
+cmds = [
+  # --- Frontend Build Steps ---
+  "cd frontend && npm install && npm run build",
+  "cd ..", # Go back to the root directory after frontend build
+
+  # --- Backend Pip Bootstrap Steps ---
+  # Download get-pip.py to ensure pip is installed correctly for python3
+  "curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py",
+  # Execute get-pip.py using the specific python3 interpreter
+  "python3 get-pip.py",
+  # Clean up the downloaded script (optional, but good practice)
+  "rm get-pip.py",
+
+  # --- Backend Dependency Installation ---
+  # Now that pip is guaranteed to be installed, install your Python requirements
+  "cd backend && python3 -m pip install -r requirements.txt"
+]
+
+# Define the start phase command for your application
+[phases.start]
+cmd = "cd backend && python3 import_data.py && python3 run.py"
