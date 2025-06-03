@@ -7,23 +7,31 @@ PYTHON_VERSION = "3.11"
 
 # Ensure pip is available by explicitly including it
 [nixpkgs]
-packages = ["nodejs_18", "python311", "python311Packages.pip", "python311Packages.setuptools"]
+packages = [
+  "nodejs_18", 
+  "python311", 
+  "python311Packages.pip", 
+  "python311Packages.setuptools",
+  "python311Packages.wheel",
+  "python311Packages.virtualenv"
+]
 
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build",
-  "cd ..", # Go back to the root directory
-  # The critical step: Ensure pip is globally available.
-  # This often involves sourcing the Nix profile to correctly set PATH.
-  # We will try to explicitly source it and check pip.
-  # Add the bin directory to PATH explicitly if not already there
-  "export PATH=$PATH:/root/.nix-profile/bin",
-  # Now, we are more confident that python3 and pip are in the PATH.
-  # Let's try to ensure pip's health before using it for requirements.
-  "python3 -m ensurepip --default-pip || true", # Ensure pip is present for python3
-  "python3 -m pip install --upgrade pip setuptools || true", # Upgrade pip and setuptools, allow to fail if already latest
+  "cd ..",
+  # Use python3 -m ensurepip to install pip if it's missing
+  "python3 -m ensurepip --upgrade",
+  # Install backend dependencies
   "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
 [phases.start]
 cmd = "cd backend && python3 import_data.py && python3 run.py"
+
+# Simplified build command
+[build]
+buildCommand = "cd frontend && npm install && npm run build && cd ../backend && python3 -m ensurepip --upgrade && python3 -m pip install -r requirements.txt"
+
+[deploy]
+startCommand = "cd backend && python3 import_data.py && python3 run.py"
