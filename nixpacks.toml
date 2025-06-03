@@ -1,32 +1,46 @@
-# Let the Python provider handle pip installation
+# More explicit approach to ensure pip works
 providers = ["node", "python"]
 
 [variables]
 NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
 
+# Include essential Python packages explicitly
+[nixpkgs]
+packages = [
+  "nodejs_18",
+  "python311",
+  "python311Packages.pip",
+  "python311Packages.setuptools", 
+  "python311Packages.wheel",
+  "python311Packages.distutils"
+]
+
 [phases.setup]
 cmds = [
-  # Verify Python and pip are available
-  "which python3",
-  "which pip3",
-  "python3 --version",
-  "pip3 --version"
+  # Debug what's available
+  "ls -la /nix/store/*/bin/ | grep -i pip || echo 'No pip found in nix store'",
+  "python3 -c 'import sys; print(sys.path)'",
+  "python3 -c 'import subprocess; print(subprocess.check_output([\"find\", \"/nix\", \"-name\", \"pip*\", \"-type\", \"f\"], text=True))' || echo 'Find failed'",
 ]
 
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build",
   "cd ..",
-  # Use pip3 instead of python3 -m pip
-  "cd backend && pip3 install -r requirements.txt"
+  # Try to bootstrap pip using get-pip.py as fallback
+  "python3 -c 'import urllib.request; urllib.request.urlretrieve(\"https://bootstrap.pypa.io/get-pip.py\", \"get-pip.py\")' || echo 'Failed to download get-pip.py'",
+  "python3 get-pip.py --user || echo 'get-pip.py failed'",
+  "export PATH=$HOME/.local/bin:$PATH",
+  # Now try to install requirements
+  "cd backend && python3 -m pip install -r requirements.txt || pip install -r requirements.txt || $HOME/.local/bin/pip install -r requirements.txt"
 ]
 
 [phases.start]
 cmd = "cd backend && python3 import_data.py && python3 run.py"
 
 [build]
-buildCommand = "cd frontend && npm install && npm run build && cd ../backend && pip3 install -r requirements.txt"
+buildCommand = "cd frontend && npm install && npm run build && cd ../backend && python3 -c 'import urllib.request; urllib.request.urlretrieve(\"https://bootstrap.pypa.io/get-pip.py\", \"get-pip.py\")' && python3 get-pip.py --user && export PATH=$HOME/.local/bin:$PATH && python3 -m pip install -r requirements.txt"
 
 [deploy]
 startCommand = "cd backend && python3 import_data.py && python3 run.py"
