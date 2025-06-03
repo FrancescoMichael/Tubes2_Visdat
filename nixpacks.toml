@@ -1,36 +1,28 @@
-# Try using nix-env to install pip system-wide
+# Simplified approach - let's try using the python provider without explicit nixpkgs
 providers = ["node", "python"]
 
 [variables]
-NODE_VERSION = "18" 
+NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
-
-[phases.setup]
-cmds = [
-  # Install pip using nix-env
-  "nix-env -iA nixpkgs.python311Packages.pip nixpkgs.python311Packages.setuptools nixpkgs.python311Packages.wheel",
-  # Verify installation
-  "which python3",
-  "python3 --version",
-  "python3 -m pip --version || echo 'pip module not available'",
-  "find /nix -name 'pip' -type f 2>/dev/null | head -5"
-]
 
 [phases.build]
 cmds = [
-  "cd frontend && npm install && npm run build", 
+  "cd frontend && npm install && npm run build",
   "cd ..",
-  # Try to find and use pip directly
-  "PIPPATH=$(find /nix -name 'pip' -type f -executable 2>/dev/null | head -1)",
-  "echo \"Found pip at: $PIPPATH\"",
-  "cd backend && $PIPPATH install -r requirements.txt"
+  # Download and install pip manually
+  "curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py",
+  "python3 get-pip.py --user",
+  # Add user pip to PATH
+  "export PATH=$HOME/.local/bin:$PATH",
+  # Install backend requirements
+  "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
 [phases.start]
-cmd = "cd backend && python3 import_data.py && python3 run.py"
+cmd = "export PATH=$HOME/.local/bin:$PATH && cd backend && python3 import_data.py && python3 run.py"
 
-[build] 
-buildCommand = "nix-env -iA nixpkgs.python311Packages.pip && cd frontend && npm install && npm run build && cd ../backend && PIPPATH=$(find /nix -name 'pip' -type f -executable 2>/dev/null | head -1) && $PIPPATH install -r requirements.txt"
+[build]
+buildCommand = "cd frontend && npm install && npm run build && cd ../backend && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py --user && export PATH=$HOME/.local/bin:$PATH && python3 -m pip install -r requirements.txt"
 
 [deploy]
-startCommand = "cd backend && python3 import_data.py && python3 run.py"
+startCommand = "export PATH=$HOME/.local/bin:$PATH && cd backend && python3 import_data.py && python3 run.py"
