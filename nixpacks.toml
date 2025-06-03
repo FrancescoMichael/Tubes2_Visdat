@@ -1,37 +1,32 @@
-# Explicit Nixpkgs packages to ensure pip is available
+# Let the Python provider handle pip installation
 providers = ["node", "python"]
 
 [variables]
 NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
 
-# Ensure pip is available by explicitly including it
-[nixpkgs]
-packages = [
-  "nodejs_18", 
-  "python311", 
-  "python311Packages.pip", 
-  "python311Packages.setuptools",
-  "python311Packages.wheel",
-  "python311Packages.virtualenv"
+[phases.setup]
+cmds = [
+  # Verify Python and pip are available
+  "which python3",
+  "which pip3",
+  "python3 --version",
+  "pip3 --version"
 ]
 
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build",
   "cd ..",
-  # Use python3 -m ensurepip to install pip if it's missing
-  "python3 -m ensurepip --upgrade",
-  # Install backend dependencies
-  "cd backend && python3 -m pip install -r requirements.txt"
+  # Use pip3 instead of python3 -m pip
+  "cd backend && pip3 install -r requirements.txt"
 ]
 
 [phases.start]
 cmd = "cd backend && python3 import_data.py && python3 run.py"
 
-# Simplified build command
 [build]
-buildCommand = "cd frontend && npm install && npm run build && cd ../backend && python3 -m ensurepip --upgrade && python3 -m pip install -r requirements.txt"
+buildCommand = "cd frontend && npm install && npm run build && cd ../backend && pip3 install -r requirements.txt"
 
 [deploy]
 startCommand = "cd backend && python3 import_data.py && python3 run.py"
