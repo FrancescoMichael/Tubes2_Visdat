@@ -1,13 +1,13 @@
-# Alternative: More explicit package specification
+# Explicit Nixpkgs packages to ensure pip is available
 providers = ["node", "python"]
 
 [variables]
 NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
 
-# Explicitly specify required packages
+# Ensure pip is available by explicitly including it
 [nixpkgs]
-packages = ["nodejs_18", "python311", "python311Packages.pip"]
+packages = ["nodejs_18", "python311", "python311Packages.pip", "python311Packages.setuptools"]
 
 [phases.build]
 cmds = [
