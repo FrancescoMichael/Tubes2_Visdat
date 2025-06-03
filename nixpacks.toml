@@ -1,46 +1,36 @@
-# More explicit approach to ensure pip works
+# Try using nix-env to install pip system-wide
 providers = ["node", "python"]
 
 [variables]
-NODE_VERSION = "18"
+NODE_VERSION = "18" 
 PYTHON_VERSION = "3.11"
-
-# Include essential Python packages explicitly
-[nixpkgs]
-packages = [
-  "nodejs_18",
-  "python311",
-  "python311Packages.pip",
-  "python311Packages.setuptools", 
-  "python311Packages.wheel",
-  "python311Packages.distutils"
-]
 
 [phases.setup]
 cmds = [
-  # Debug what's available
-  "ls -la /nix/store/*/bin/ | grep -i pip || echo 'No pip found in nix store'",
-  "python3 -c 'import sys; print(sys.path)'",
-  "python3 -c 'import subprocess; print(subprocess.check_output([\"find\", \"/nix\", \"-name\", \"pip*\", \"-type\", \"f\"], text=True))' || echo 'Find failed'",
+  # Install pip using nix-env
+  "nix-env -iA nixpkgs.python311Packages.pip nixpkgs.python311Packages.setuptools nixpkgs.python311Packages.wheel",
+  # Verify installation
+  "which python3",
+  "python3 --version",
+  "python3 -m pip --version || echo 'pip module not available'",
+  "find /nix -name 'pip' -type f 2>/dev/null | head -5"
 ]
 
 [phases.build]
 cmds = [
-  "cd frontend && npm install && npm run build",
+  "cd frontend && npm install && npm run build", 
   "cd ..",
-  # Try to bootstrap pip using get-pip.py as fallback
-  "python3 -c 'import urllib.request; urllib.request.urlretrieve(\"https://bootstrap.pypa.io/get-pip.py\", \"get-pip.py\")' || echo 'Failed to download get-pip.py'",
-  "python3 get-pip.py --user || echo 'get-pip.py failed'",
-  "export PATH=$HOME/.local/bin:$PATH",
-  # Now try to install requirements
-  "cd backend && python3 -m pip install -r requirements.txt || pip install -r requirements.txt || $HOME/.local/bin/pip install -r requirements.txt"
+  # Try to find and use pip directly
+  "PIPPATH=$(find /nix -name 'pip' -type f -executable 2>/dev/null | head -1)",
+  "echo \"Found pip at: $PIPPATH\"",
+  "cd backend && $PIPPATH install -r requirements.txt"
 ]
 
 [phases.start]
 cmd = "cd backend && python3 import_data.py && python3 run.py"
 
-[build]
-buildCommand = "cd frontend && npm install && npm run build && cd ../backend && python3 -c 'import urllib.request; urllib.request.urlretrieve(\"https://bootstrap.pypa.io/get-pip.py\", \"get-pip.py\")' && python3 get-pip.py --user && export PATH=$HOME/.local/bin:$PATH && python3 -m pip install -r requirements.txt"
+[build] 
+buildCommand = "nix-env -iA nixpkgs.python311Packages.pip && cd frontend && npm install && npm run build && cd ../backend && PIPPATH=$(find /nix -name 'pip' -type f -executable 2>/dev/null | head -1) && $PIPPATH install -r requirements.txt"
 
 [deploy]
 startCommand = "cd backend && python3 import_data.py && python3 run.py"
