@@ -1,4 +1,5 @@
 [build]
-builder = "nixpacks"
-buildCommand = "cd backend && pip install -r requirements.txt"
-startCommand = "cd backend && gunicorn run:app --bind 0.0.0.0:5000"
+buildCommand = "cd frontend && npm install && npm run build && cd ../backend && pip install -r requirements.txt"
+
+[deploy]
+startCommand = "cd backend && python import_data.py && python run.py"
