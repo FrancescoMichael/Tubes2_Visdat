@@ -5,33 +5,36 @@ providers = ["node", "python"]
 NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
 
-# Ensure pip is available by explicitly including it
+# Ensure python3.11 and necessary build tools are available
 [nixpkgs]
 packages = [
-  "nodejs_18", 
-  "python311", 
-  "python311Packages.pip", 
-  "python311Packages.setuptools",
-  "python311Packages.wheel",
-  "python311Packages.virtualenv"
+    "nodejs_18",
+    "python311",
+    # We explicitly install pip below, so no need to request python311Packages.pip here.
+    # However, keeping it doesn't hurt and might be good for general system state.
+    "python311Packages.pip",
+    "python311Packages.setuptools",
+    "curl", # We need curl to download get-pip.py
+    "build-tools" # Ensure common build tools like gcc are available for some python packages
 ]
 
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build",
-  "cd ..",
-  # Use python3 -m ensurepip to install pip if it's missing
-  "python3 -m ensurepip --upgrade",
-  # Install backend dependencies
+  "cd ..", # Go back to the root directory
+
+  # --- NEW PIP BOOTSTRAP STEPS ---
+  # Download get-pip.py directly
+  "curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py",
+  # Install pip for the specific python3 interpreter
+  "python3 get-pip.py",
+  # Clean up the script (optional)
+  "rm get-pip.py",
+  # --- END NEW PIP BOOTSTRAP STEPS ---
+
+  # Now, with pip guaranteed to be installed, install backend requirements
   "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
 [phases.start]
 cmd = "cd backend && python3 import_data.py && python3 run.py"
-
-# Simplified build command
-[build]
-buildCommand = "cd frontend && npm install && npm run build && cd ../backend && python3 -m ensurepip --upgrade && python3 -m pip install -r requirements.txt"
-
-[deploy]
-startCommand = "cd backend && python3 import_data.py && python3 run.py"
