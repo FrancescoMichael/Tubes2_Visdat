@@ -20,7 +20,7 @@ http://localhost:5000/api/stats/poles/2024
 http://localhost:5000/api/stats/wins/2024
 */
 
-export const API_BASE_URL = "http://localhost:5000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const API_DRIVER_STANDINGS = `${API_BASE_URL}/standings/drivers`;
 export const API_CONSTRUCTOR_STANDINGS = `${API_BASE_URL}/standings/constructors`;
