@@ -32,6 +32,7 @@ export const API_CIRCUITS_RESULT = `${API_BASE_URL}/circuits/results`;
 export const API_YEARS = `${API_BASE_URL}/years`;
 
 export const API_DRIVER_JOURNEYS = `${API_BASE_URL}/journeys/drivers`;
+export const API_JOURNEY = `${API_BASE_URL}/journeys`;
 export const API_CONSTRUCTOR_JOURNEYS = `${API_BASE_URL}/journeys/constructors`;
 
 export const API_STATS_POLES = `${API_BASE_URL}/stats/poles`;
