@@ -1,6 +1,9 @@
-[providers]
-node = "18"
-python = "3.11"
+# Fix: providers should be an array, not a map
+providers = ["node", "python"]
+
+[variables]
+NODE_VERSION = "18"
+PYTHON_VERSION = "3.11"
 
 [phases.build]
 cmds = [
