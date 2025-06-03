@@ -12,11 +12,14 @@ packages = ["nodejs_18", "python311", "python311Packages.pip", "python311Package
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build",
-  # Go back to the root directory before running backend commands
-  "cd ..",
-  # Explicitly ensure pip and setuptools are healthy for python3
-  "python3 -m pip install --upgrade pip setuptools",
-  # Now install backend requirements using the verified pip
+  "cd ..", # Go back to the root directory
+  # Attempt to ensure pip is available and on PATH, or use its direct location
+  # Let's try making sure pip is callable.
+  # This command is often what makes pip work reliably in Nix environments
+  "source /root/.nix-profile/etc/profile.d/nix.sh || true", # Ensure Nix profile is sourced
+  "export PATH=$PATH:/root/.nix-profile/bin", # Explicitly add nix-profile bin to PATH
+  "python3 -m ensurepip --default-pip || true", # Ensure pip is initialized for python3
+  "python3 -m pip install --upgrade pip setuptools", # Upgrade pip and setuptools for robustness
   "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
