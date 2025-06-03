@@ -10,14 +10,12 @@ PYTHON_VERSION = "3.11"
 packages = ["nodejs_18", "python311", "python311Packages.pip", "python311Packages.setuptools"]
 
 [phases.build]
-# Add a step to ensure pip is accessible
 cmds = [
   "cd frontend && npm install && npm run build",
-  # Attempt to install pip tools for the specific python3.11 if it's not present globally
-  "python3.11 -m ensurepip --default-pip || true", # ensure pip is there
-  "python3.11 -m pip install --upgrade pip setuptools", # upgrade pip and setuptools
-  "cd backend && python3.11 -m pip install -r requirements.txt"
+  # Nixpacks ensures 'python3' points to PYTHON_VERSION.
+  # 'python3 -m pip' is the robust way to call pip for that specific python.
+  "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
 [phases.start]
-cmd = "cd backend && python3.11 import_data.py && python3.11 run.py"
+cmd = "cd backend && python3 import_data.py && python3 run.py"
