@@ -12,8 +12,11 @@ packages = ["nodejs_18", "python311", "python311Packages.pip", "python311Package
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build",
-  # Nixpacks ensures 'python3' points to PYTHON_VERSION.
-  # 'python3 -m pip' is the robust way to call pip for that specific python.
+  # Go back to the root directory before running backend commands
+  "cd ..",
+  # Explicitly ensure pip and setuptools are healthy for python3
+  "python3 -m pip install --upgrade pip setuptools",
+  # Now install backend requirements using the verified pip
   "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
